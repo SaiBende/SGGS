@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { QRCodeCanvas } from 'qrcode.react';
 
 function InputCardLink() {
     const [longURL, setLongURL] = useState('');
@@ -17,7 +18,7 @@ function InputCardLink() {
 
         const token = localStorage.getItem('token');
         console.log(token);
-        
+
         if (token) {
             // Set the token as a cookie
             document.cookie = `token=${token}; path=/`;
@@ -39,12 +40,12 @@ function InputCardLink() {
             };
 
             // Make the request to the server
-            fetch("http://localhost:8000/", requestOptions)
+            fetch(`${import.meta.env.VITE_API_URL}/`, requestOptions)
                 .then(response => response.json()) // Convert response to JSON
                 .then(result => {
                     setLoading(false); // Stop loading
                     if (result.id) {
-                        const newURL = `http://localhost:8000/${result.id}`;
+                        const newURL = `${import.meta.env.VITE_API_URL}/${result.id}`;
                         setShortenedURL(newURL); // Store the shortened URL
                     } else {
                         setError("Failed to generate URL");
@@ -56,7 +57,7 @@ function InputCardLink() {
                 });
         } else {
             // Redirect to login if token is not found
-            window.location.href = "/login";
+            window.location.href = "/register";
         }
     };
 
@@ -68,10 +69,24 @@ function InputCardLink() {
         });
     };
 
+    // Function to download the QR code as an image
+    const downloadQRCode = () => {
+        const canvas = document.getElementById("qrcode");
+        const pngUrl = canvas
+            .toDataURL("image/png")
+            .replace("image/png", "image/octet-stream");
+        let downloadLink = document.createElement("a");
+        downloadLink.href = pngUrl;
+        downloadLink.download = "qrcode.png";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    };
+
     return (
         <>
             <section className='bg-gray-50 dark:bg-gray-900 p-2'>
-                <h2 className="text-xl text-center font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white p-2">
+                <h2 className="text-3xl text-center font-bold leading-tight tracking-tight text-gray-900 md:text-2xl xl:text-3xl dark:text-white p-2">
                     Shorten Your Loooooooooong URL
                 </h2>
 
@@ -161,6 +176,30 @@ function InputCardLink() {
                             <p className="text-green-600 dark:text-green-400 mt-2">{copySuccess}</p>
                         )}
                     </div>
+                )}
+
+                {/* QR Code Generation and Download */}
+                {shortenedURL && (
+                    <div className="mt-5 flex flex-col items-center">
+                        <p className="text-lg text-gray-900 dark:text-white">Your QR code:</p>
+                        <QRCodeCanvas
+                            id="qrcode"
+                            value={shortenedURL}
+                            size={200}
+                            bgColor={"#ffffff"}
+                            fgColor={"#000000"}
+                            level={"H"}
+                            className=''
+                            includeMargin={false}
+                        />
+                        <button
+                            onClick={downloadQRCode}
+                            className="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-3 dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
+                        >
+                            Download QR Code
+                        </button>
+                    </div>
+
                 )}
             </section>
         </>

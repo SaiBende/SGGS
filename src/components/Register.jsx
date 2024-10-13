@@ -38,7 +38,7 @@ function Register() {
     };
 
     try {
-      const response = await fetch('http://localhost:8000/user/register', requestOptions);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/user/register`, requestOptions);
       const result = await response.json();  // Parse response as JSON
 
       if (response.ok) {

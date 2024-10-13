@@ -14,9 +14,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from './Layout'
 import About from './pages/About'
 import Services from './pages/Services'
-import Contact from './pages/Contact'
+import LinkTree from './pages/LinkTree'
 import Pricing from './pages/Pricing'
 import Dashboard from './pages/Dashboard'
+import Home from './pages/Home'
+import RedirectURL from './components/RedirectURL'
+
 
 function App() {
 
@@ -26,17 +29,24 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<><Hero /><InputCardLink/></>} />
-            <Route path="inputlink" element={<InputCardLink/>} />
+            <Route index element={<><Home /></>} />
+            <Route path="inputlink" element={<InputCardLink />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="about" element={<About />} />
             <Route path="services" element={<Services />} />
-            <Route path="contact" element={<Contact />} />
+            <Route path="linktree" element={<LinkTree />} />
+
             <Route path="pricing" element={<Pricing />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route  path=":shortId" element={<RedirectURL/>}/>
             {/* <Route path="*" element={<NoPage />} /> */}
           </Route>
+          <Route path='/u'>
+            <Route path=":username" element={<ProfileCard />} />
+          </Route>
+          
+          
         </Routes>
       </BrowserRouter>
       {/* <Navigationbar/>

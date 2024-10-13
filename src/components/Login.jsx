@@ -30,7 +30,7 @@ function Login() {
         };
 
         try {
-            const response = await fetch("http://localhost:8000/user/login", requestOptions);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/user/login`, requestOptions);
             const result = await response.json(); // Parse response as JSON
 
             if (response.ok) {
@@ -43,7 +43,7 @@ function Login() {
 
                 // Redirect to the dashboard or home page after 2 seconds
                 setTimeout(() => {
-                    navigate('/dashboard'); // Change this to your desired route
+                    navigate('/'); // Change this to your desired route
                 }, 2000);
             } else {
                 // Handle error response from backend
