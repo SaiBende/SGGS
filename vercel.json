@@ -27,11 +27,6 @@
         "source": "/user/:path*",
         "destination": "/api/user/:path*"
       }
-    ],
-    "cors": {
-      "allowMethods": ["GET", "POST", "PUT", "DELETE"],
-      "allowHeaders": ["Authorization", "Content-Type"],
-      "allowCredentials": true
-    }
+    ]
   }
   
