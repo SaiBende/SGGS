@@ -1,16 +1,17 @@
+
+
+
 import React, { useState, useEffect } from 'react';
 
 function LinkTree() {
     const [user, setUser] = useState(null);
     const [username, setUsername] = useState('');
     const [socialMediaLinks, setSocialMediaLinks] = useState({});
-    
+    const [description, setDescription] = useState('');  // State for user description
     const [newPlatform, setNewPlatform] = useState('');
     const [newLink, setNewLink] = useState('');
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
-    
-    
 
     // Fetch user data using the JWT token
     useEffect(() => {
@@ -44,7 +45,6 @@ function LinkTree() {
 
     // Fetch the public profile data of the user
     const fetchUserProfile = (username) => {
-       
         fetch(`${import.meta.env.VITE_API_URL}/u/${username}`)
             .then((response) => response.json())
             .then((data) => {
@@ -52,7 +52,7 @@ function LinkTree() {
                     setError(data.error);
                 } else {
                     setSocialMediaLinks(data.socialMediaLinks || {});
-                  
+                    setDescription(data.description || ''); // Load existing description if available
                     setError(null); // Clear any previous errors
                 }
             })
@@ -65,8 +65,8 @@ function LinkTree() {
     // Add a new social media link
     const addSocialMediaLink = (e) => {
         e.preventDefault();
-        setError(null); // Clear any previous error messages
-        setSuccessMessage(''); // Clear any previous success messages
+        setError(null); 
+        setSuccessMessage('');
 
         const token = localStorage.getItem('token');
         if (!token) {
@@ -74,7 +74,6 @@ function LinkTree() {
             return;
         }
 
-        // Set up headers as done in Postman
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'application/json');
         myHeaders.append('Cookie', `token=${token}`);
@@ -88,19 +87,12 @@ function LinkTree() {
             method: 'POST',
             headers: myHeaders,
             body: requestBody,
-            credentials: 'include', // Include cookies in the request
+            credentials: 'include',
             redirect: 'follow',
         };
 
         fetch(`${import.meta.env.VITE_API_URL}/u/${username}/social-media/add`, requestOptions)
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((error) => {
-                        throw new Error(error.error || 'Failed to add social media link.');
-                    });
-                }
-                return response.json();
-            })
+            .then((response) => response.json())
             .then((result) => {
                 if (result.success) {
                     setSocialMediaLinks(result.socialMediaLinks);
@@ -116,47 +108,39 @@ function LinkTree() {
                 setError(error.message || 'Failed to add social media link.');
             });
     };
-    const deleteSocialMediaLink = (platform) => {
+
+    // Update user description
+    const updateDescription = () => {
         const token = localStorage.getItem('token');
         if (!token) {
-            setError('Please log in to delete social media links.');
+            setError('Please log in to update the description.');
             return;
         }
-    
+
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'application/json');
         myHeaders.append('Cookie', `token=${token}`);
-    
-        const requestBody = JSON.stringify({ platform });
-    
+
         const requestOptions = {
-            method: 'DELETE',
+            method: 'POST',
             headers: myHeaders,
-            body: requestBody,
+            body: JSON.stringify({ description }),
             credentials: 'include',
             redirect: 'follow',
         };
-    
-        fetch(`${import.meta.env.VITE_API_URL}/u/${username}/social-media/delete`, requestOptions)
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((error) => {
-                        throw new Error(error.error || 'Failed to delete social media link.');
-                    });
-                }
-                return response.json();
-            })
+
+        fetch(`${import.meta.env.VITE_API_URL}/u/${username}/description`, requestOptions)
+            .then((response) => response.json())
             .then((result) => {
                 if (result.success) {
-                    setSocialMediaLinks(result.socialMediaLinks);
-                    setSuccessMessage(`${platform} link deleted successfully.`);
+                    setSuccessMessage('Description updated successfully.');
                 } else {
-                    setError(result.error || 'Failed to delete social media link.');
+                    setError(result.error || 'Failed to update description.');
                 }
             })
             .catch((error) => {
-                console.error('Error deleting social media link:', error);
-                setError(error.message || 'Failed to delete social media link.');
+                console.error('Error updating description:', error);
+                setError(error.message || 'Failed to update description.');
             });
     };
 
@@ -168,8 +152,24 @@ function LinkTree() {
             {successMessage && <p className="text-green-600 text-center">{successMessage}</p>}
 
             <div className="max-w-md mx-auto bg-white p-4 rounded shadow-md dark:bg-gray-700">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{user?.username}'s Social Media Links</h3>
-                <ul>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{user?.username|| "Your UserName"}'s Profile</h3>
+
+                {/* Description Section */}
+                <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Add a description about yourself"
+                    className="w-full p-2 border rounded mb-2"
+                />
+                <button
+                    onClick={updateDescription}
+                    className="bg-blue-600 text-white p-2 rounded w-full"
+                >
+                    Update Description
+                </button>
+
+                {/* Social Media Links */}
+                <ul className="mt-4">
                     {Object.entries(socialMediaLinks).map(
                         ([platform, link]) =>
                             link && (
@@ -182,17 +182,12 @@ function LinkTree() {
                                     >
                                         {platform}: {link}
                                     </a>
-                                    <button
-                                        onClick={() => deleteSocialMediaLink(platform)}
-                                        className="text-red-500 ml-4"
-                                    >
-                                        Delete
-                                    </button>
                                 </li>
                             )
                     )}
                 </ul>
 
+                {/* Form to Add New Social Media Link */}
                 <form onSubmit={addSocialMediaLink} className="mt-4">
                     <input
                         type="text"
@@ -220,3 +215,5 @@ function LinkTree() {
 }
 
 export default LinkTree;
+
+

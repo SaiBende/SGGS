@@ -1,27 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-
 function ProfileCard() {
   const [profile, setProfile] = useState(null); // State to store profile data
   const [loading, setLoading] = useState(true); // Loading state
-  const params=useParams();
-  const {username}=params;
-  
+  const params = useParams();
+  const { username } = params;
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/u/`+username); // Adjust the URL and username as needed
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/u/` + username);
         const data = await response.json();
         setProfile(data);
-        console.log(data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
     };
-    
-    fetchProfile(); // Fetch profile on component mount
+
+    fetchProfile();
   }, []);
 
   if (loading) {
@@ -33,31 +31,34 @@ function ProfileCard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-      <div className="w-full max-w-md bg-gray-800 p-6 rounded-lg shadow-lg">
+    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="w-full max-w-md bg-black p-6 rounded-lg shadow-lg">
         <div className="flex flex-col items-center">
           <img
-            src={
-              "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            }
+            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Profile"
             className="w-32 h-32 rounded-full border-4 border-green-500 mb-4"
           />
           <h1 className="text-3xl font-bold mb-2">{profile.username}</h1>
           <p className="text-green font-semibold mb-4">{profile.description}</p>
         </div>
-        <div className="flex flex-col items-center space-y-2">
-          {/* Map through the socialMediaLinks dynamically */}
+
+        <div className="flex flex-col items-center space-y-4">
+          {/* Apply the gradient button style to each social media link */}
           {Object.entries(profile.socialMediaLinks).map(([platform, link]) => (
-            <a
-              key={platform}
-              href={link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full text-center text-lg font-semibold bg-gray-700 hover:bg-green hover:text-black py-2 rounded-md"
-            >
-              {platform.charAt(0).toUpperCase() + platform.slice(1)} {/* Capitalize platform name */}
-            </a>
+            <div className="relative inline-flex group w-full" key={platform}>
+              <div
+                className="absolute transition-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] rounded-md blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt"
+              ></div>
+              <a
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative inline-flex items-center justify-center w-full py-2 text-lg font-semibold text-white transition-all duration-200 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+              >
+                {platform.charAt(0).toUpperCase() + platform.slice(1)}
+              </a>
+            </div>
           ))}
         </div>
       </div>
