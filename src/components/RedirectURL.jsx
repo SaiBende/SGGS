@@ -23,9 +23,10 @@ function RedirectURL() {
   }, [shortId]);
 
   return (
-    <div>
+    <>
+      <h2 className='text-4xl  text-green-700'>Your Brandeed Avertisement</h2>
       <p>Redirecting...</p>
-    </div>
+    </>
   );
 }
 

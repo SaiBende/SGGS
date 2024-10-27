@@ -4,40 +4,48 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 function Navigationbar() {
     const [user, setUser] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [error, setError] = useState(null); // State to store error messages
     const navigate = useNavigate();
     const location = useLocation(); // For active link highlighting
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            document.cookie = `token=${token}; path=/;`;
-            const myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
+        const fetchUserData = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                document.cookie = `token=${token}; path=/;`;
 
-            const requestOptions = {
-                method: 'POST',
-                credentials: 'include',
-                headers:myHeaders,
-                
-                redirect: 'follow',
-            };
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+                myHeaders.append("Authorization", `Bearer ${token}`);
+                myHeaders.append("Access-Control-Allow-Credentials", true);
 
-            fetch(`${import.meta.env.VITE_API_URL}/user/dashboard`, requestOptions)
-                .then(response => {
+                const requestOptions = {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: myHeaders,
+                    redirect: 'follow',
+                };
+
+                try {
+                    const response = await fetch(`${import.meta.env.VITE_API_URL}/user/dashboard`, requestOptions);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                    return response.json();
-                })
-                .then(result => {
+                    const result = await response.json();
                     if (result.success) {
                         setUser(result.user);
                     } else {
                         console.error('Error fetching user data:', result.error);
+                        setError(result.error || 'Error fetching user data.');
                     }
-                })
-                .catch(error => console.error('Error fetching user data:', error));
-        }
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                    setError(error.message || 'Error fetching user data.');
+                }
+            }
+        };
+
+        fetchUserData();
     }, [navigate]);
 
     const handleLogout = () => {
@@ -146,6 +154,7 @@ function Navigationbar() {
                     )}
                 </div>
             </div>
+            {error && <div className="text-red-600 text-center mt-4">{error}</div>} {/* Display error message */}
         </nav>
     );
 }

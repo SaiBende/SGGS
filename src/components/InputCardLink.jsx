@@ -45,7 +45,7 @@ function InputCardLink() {
                 .then(result => {
                     setLoading(false); // Stop loading
                     if (result.id) {
-                        const newURL = `${import.meta.env.VITE_API_URL}/${result.id}`;
+                        const newURL = `${import.meta.env.VITE_FRONTEND_URL}/${result.id}`;
                         setShortenedURL(newURL); // Store the shortened URL
                     } else {
                         setError("Failed to generate URL");
