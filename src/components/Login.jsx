@@ -40,6 +40,7 @@ function Login() {
 
                 // Store the token in local storage
                 localStorage.setItem("token", result.token);
+                document.cookie = `token=${result.token}; path=/;`;
 
                 // Redirect to the dashboard or home page after 2 seconds
                 setTimeout(() => {

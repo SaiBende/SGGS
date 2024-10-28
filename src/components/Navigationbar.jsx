@@ -18,7 +18,6 @@ function Navigationbar() {
                 myHeaders.append("Content-Type", "application/json");
                 myHeaders.append("Authorization", `Bearer ${token}`);
                 myHeaders.append("Access-Control-Allow-Credentials", true);
-                myHeaders.append("Cookie", `token=${token}`);
 
                 const requestOptions = {
                     method: 'POST',
