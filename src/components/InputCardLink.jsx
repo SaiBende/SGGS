@@ -25,6 +25,7 @@ function InputCardLink() {
 
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("Authorization", token);
 
             const raw = JSON.stringify({
                 url: longURL,

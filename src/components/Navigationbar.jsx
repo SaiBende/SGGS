@@ -12,11 +12,11 @@ function Navigationbar() {
         const fetchUserData = async () => {
             const token = localStorage.getItem('token');
             if (token) {
-                document.cookie = `token=${token}; path=/;`;
+                // document.cookie = `token=${token}; path=/;`;
 
-                const myHeaders = new Headers();
+                const myHeaders = new Headers({});
                 myHeaders.append("Content-Type", "application/json");
-                myHeaders.append("Authorization", `Bearer ${token}`);
+                myHeaders.append("Authorization", localStorage.getItem('token'));
                 myHeaders.append("Access-Control-Allow-Credentials", true);
 
                 const requestOptions = {

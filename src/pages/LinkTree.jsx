@@ -18,9 +18,12 @@ function LinkTree() {
         const token = localStorage.getItem('token');
         if (token) {
             document.cookie = `token=${token}; path=/;`;
-
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("Authorization", token);
             const requestOptions = {
                 method: 'POST',
+                headers:myHeaders,
                 credentials: 'include',
                 redirect: 'follow',
             };
@@ -76,7 +79,8 @@ function LinkTree() {
 
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'application/json');
-        myHeaders.append('Cookie', `token=${token}`);
+       
+        myHeaders.append("Authorization", token);
 
         const requestBody = JSON.stringify({
             platform: newPlatform,
@@ -119,7 +123,7 @@ function LinkTree() {
 
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'application/json');
-        myHeaders.append('Cookie', `token=${token}`);
+        myHeaders.append("Authorization", token);
 
         const requestOptions = {
             method: 'POST',

@@ -13,6 +13,7 @@ function Dashboard() {
             document.cookie = `token=${token}; path=/;`;
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("Authorization", token);
 
             const requestOptions = {
                 method: 'POST',
