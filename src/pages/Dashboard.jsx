@@ -10,7 +10,7 @@ function Dashboard() {
         console.log(token);
 
         if (token) {
-            document.cookie = `token=${token}; path=/;`;
+            // document.cookie = `token=${token}; path=/;`;
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("Authorization", token);

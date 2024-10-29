@@ -27,13 +27,14 @@ function Navigationbar() {
                 };
 
                 try {
-                    const response = await fetch(`${import.meta.env.VITE_API_URL}/user/dashboard`, requestOptions);
+                    const response = await fetch(`${import.meta.env.VITE_API_URL}/user`, requestOptions);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const result = await response.json();
+                    console.log(result);
                     if (result.success) {
-                        setUser(result.user);
+                        setUser(result.user.email);
                     } else {
                         console.error('Error fetching user data:', result.error);
                         setError(result.error || 'Error fetching user data.');
@@ -128,7 +129,7 @@ function Navigationbar() {
                         <div className="flex items-center">
                             <Link to="/dashboard">
                                 <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                    Welcome {user.username}
+                                    Welcome {user}
                                 </button>
                             </Link>
                             <button 
