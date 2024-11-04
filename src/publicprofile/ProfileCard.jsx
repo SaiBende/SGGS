@@ -12,6 +12,7 @@ function ProfileCard() {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/u/` + username);
         const data = await response.json();
+        console.log(data);
         setProfile(data);
         setLoading(false);
       } catch (error) {
@@ -35,7 +36,7 @@ function ProfileCard() {
       <div className="w-full max-w-md bg-black p-6 rounded-lg shadow-lg">
         <div className="flex flex-col items-center">
           <img
-            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            src={`${profile.profilephoto}`}
             alt="Profile"
             className="w-32 h-32 rounded-full border-4 border-green-500 mb-4"
           />

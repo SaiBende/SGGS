@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect } from 'react';
 
 function LinkTree() {
@@ -13,6 +10,11 @@ function LinkTree() {
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
 
+
+    // New state for profile photo
+    const [profilephoto, setProfilephoto] = useState(null);
+    const[profilephotoUrl, setProfilephotoUrl] = useState(null);
+
     // Fetch user data using the JWT token
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -21,9 +23,10 @@ function LinkTree() {
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("Authorization", token);
+
             const requestOptions = {
                 method: 'POST',
-                headers:myHeaders,
+                headers: myHeaders,
                 credentials: 'include',
                 redirect: 'follow',
             };
@@ -32,8 +35,10 @@ function LinkTree() {
                 .then((response) => response.json())
                 .then((result) => {
                     if (result.success) {
+                        console.log(result.user);
                         setUser(result.user);
                         setUsername(result.user.username);
+                        setProfilephotoUrl(result.user.profilephoto);
                         fetchUserProfile(result.user.username);
                     } else {
                         setError(result.error || 'Error fetching user data.');
@@ -56,6 +61,7 @@ function LinkTree() {
                 } else {
                     setSocialMediaLinks(data.socialMediaLinks || {});
                     setDescription(data.description || ''); // Load existing description if available
+                    
                     setError(null); // Clear any previous errors
                 }
             })
@@ -65,10 +71,66 @@ function LinkTree() {
             });
     };
 
+
+
+      // Function to handle profile photo selection
+    const handleProfilePhotoChange = (e) => {
+        const file = e.target.files[0];
+        setProfilephoto(file);
+    };
+
+    // Function to upload profile photo
+    const uploadProfilePhoto = () => {
+        if (!profilephoto) {
+            setError('Please select a photo to upload.');
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setError('Please log in to upload your profile photo.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('profilephoto', profilephoto);
+
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                "Authorization": token,
+            },
+            body: formData,
+            credentials: 'include',
+            redirect: 'follow',
+        };
+
+        fetch(`${import.meta.env.VITE_API_URL}/u/${username}/updateprofilephoto`, requestOptions)
+            .then((response) => response.json())
+            .then((result) => {
+                if (result.success) {
+                    setSuccessMessage('Profile photo uploaded successfully.');
+                    // Optionally update the user object to reflect the new photo
+                    setUser((prevUser) => ({
+                        ...prevUser,
+                        profilephoto: result.profilephotoUrl,
+                    }));
+                    setProfilephotoUrl(result.user.profilephoto);
+                   //console.log(profilephotoUrl);
+                } else {
+                    setError(result.error || 'Failed to upload profile photo.');
+                }
+            })
+            .catch((error) => {
+                console.error('Error uploading profile photo:', error);
+                setError(error.message || 'Failed to upload profile photo.');
+            });
+    };
+
     // Add a new social media link
     const addSocialMediaLink = (e) => {
         e.preventDefault();
-        setError(null); 
+        setError(null);
         setSuccessMessage('');
 
         const token = localStorage.getItem('token');
@@ -79,7 +141,6 @@ function LinkTree() {
 
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'application/json');
-       
         myHeaders.append("Authorization", token);
 
         const requestBody = JSON.stringify({
@@ -110,6 +171,51 @@ function LinkTree() {
             .catch((error) => {
                 console.error('Error adding social media link:', error);
                 setError(error.message || 'Failed to add social media link.');
+            });
+    };
+
+    // Delete a social media link
+    const deleteSocialMediaLink = (platform) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setError('Please log in to delete social media links.');
+            return;
+        }
+
+        const myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'application/json');
+        myHeaders.append("Authorization", token);
+
+        const requestBody = JSON.stringify({ platform });
+
+        const requestOptions = {
+            method: 'DELETE',
+            headers: myHeaders,
+            body: requestBody,
+            credentials: 'include',
+            redirect: 'follow',
+        };
+
+        fetch(`${import.meta.env.VITE_API_URL}/u/${username}/social-media/delete`, requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    return response.json().then((error) => {
+                        throw new Error(error.error || 'Failed to delete social media link.');
+                    });
+                }
+                return response.json();
+            })
+            .then((result) => {
+                if (result.success) {
+                    setSocialMediaLinks(result.socialMediaLinks);
+                    setSuccessMessage(`${platform} link deleted successfully.`);
+                } else {
+                    setError(result.error || 'Failed to delete social media link.');
+                }
+            })
+            .catch((error) => {
+                console.error('Error deleting social media link:', error);
+                setError(error.message || 'Failed to delete social media link.');
             });
     };
 
@@ -156,7 +262,27 @@ function LinkTree() {
             {successMessage && <p className="text-green-600 text-center">{successMessage}</p>}
 
             <div className="max-w-md mx-auto bg-white p-4 rounded shadow-md dark:bg-gray-700">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{user?.username|| "Your UserName"}'s Profile</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{user?.username || "Your UserName"}'s Profile</h3>
+
+                 {/* Profile Photo Upload Section */}
+                 <div className="mb-4">
+                    {profilephotoUrl ? (
+                        <img
+                            src={`${profilephotoUrl}`}
+                            alt="Profile"
+                            className="w-24 h-24 rounded-full mx-auto mb-2"
+                        />
+                    ) : (
+                        <p className="text-center text-gray-500">No profile photo</p>
+                    )}
+                    <input type="file" accept="image/*" onChange={handleProfilePhotoChange} />
+                    <button
+                        onClick={uploadProfilePhoto}
+                        className="bg-blue-600 text-white p-2 rounded w-full mt-2"
+                    >
+                        Upload Profile Photo
+                    </button>
+                </div>
 
                 {/* Description Section */}
                 <textarea
@@ -177,15 +303,24 @@ function LinkTree() {
                     {Object.entries(socialMediaLinks).map(
                         ([platform, link]) =>
                             link && (
-                                <li key={platform} className="flex justify-between items-center my-2">
+                                <li
+                                    key={platform}
+                                    className="flex flex-col md:flex-row md:justify-between items-start md:items-center my-2"
+                                >
                                     <a
                                         href={link}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-blue-600 dark:text-blue-400"
+                                        className="text-blue-600 dark:text-blue-400 break-all md:truncate w-full md:max-w-md"
                                     >
                                         {platform}: {link}
                                     </a>
+                                    <button
+                                        onClick={() => deleteSocialMediaLink(platform)}
+                                        className="bg-red-600 text-white p-2 rounded mt-2 md:mt-0 md:ml-4"
+                                    >
+                                        Delete
+                                    </button>
                                 </li>
                             )
                     )}
@@ -219,5 +354,3 @@ function LinkTree() {
 }
 
 export default LinkTree;
-
-

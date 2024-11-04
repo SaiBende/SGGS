@@ -14,8 +14,10 @@ function Dashboard() {
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("Authorization", token);
-
+            // myHeaders.append("Access-Control-Allow-Origin", "localhost:8000");
+           
             const requestOptions = {
+               
                 method: 'POST',
                 credentials: 'include', // Include cookies in the request
                 redirect: 'follow',

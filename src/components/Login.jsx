@@ -19,6 +19,8 @@ function Login() {
 
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        // myHeaders.append("Access-Control-Allow-Origin", "*");
+        // myHeaders.append("Authorization", token);
 
         const raw = JSON.stringify({ email, password });
 

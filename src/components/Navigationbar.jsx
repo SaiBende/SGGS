@@ -14,20 +14,21 @@ function Navigationbar() {
             if (token) {
                 // document.cookie = `token=${token}; path=/;`;
 
-                const myHeaders = new Headers({});
+                const myHeaders = new Headers();
                 myHeaders.append("Content-Type", "application/json");
-                myHeaders.append("Authorization", localStorage.getItem('token'));
-                myHeaders.append("Access-Control-Allow-Credentials", true);
+                myHeaders.append("Authorization", token);
+                // myHeaders.append("Access-Control-Allow-Credentials", true);
 
                 const requestOptions = {
+                  
                     method: 'POST',
-                    credentials: 'include',
+                    // credentials: 'include',
                     headers: myHeaders,
                     redirect: 'follow',
                 };
 
                 try {
-                    const response = await fetch(`${import.meta.env.VITE_API_URL}/user`, requestOptions);
+                    const response = await fetch(`${import.meta.env.VITE_API_URL}/user/isauth`, requestOptions);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
