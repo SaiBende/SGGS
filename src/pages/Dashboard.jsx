@@ -96,8 +96,8 @@ function Dashboard() {
                             {userData.urls.map((url) => (
                                 <tr key={url._id}>
                                     <td className="py-2 sm:py-3 px-4 sm:px-6">
-                                        <a href={`http://localhost:5173/${url.shortId}`} className="text-blue-500 hover:underline">
-                                            {`http://localhost:5173/${url.shortId}`}
+                                        <a href={`${import.meta.env.VITE_FRONTEND_URL}/${url.shortId}`} className="text-blue-500 hover:underline">
+                                            {`${import.meta.env.VITE_FRONTEND_URL}/${url.shortId}`}
                                         </a>
                                     </td>
                                     <td className="py-2 sm:py-3 px-4 sm:px-6">
