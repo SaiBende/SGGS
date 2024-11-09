@@ -5,9 +5,9 @@ import ProductCard from '../components/ProductCard';
 import Featured from '../components/Featured';
 import SocialProof from '../components/SocialProof';
 
-import ShortImg from '../assets/ShortImg.png';
-import QRCode from '../assets/QRcdoe.png';
-import LinkTreeImg from '../assets/linktree-link.png';
+import ShortImg from '../assets/short-link-card-opt.png';
+import QRCode from '../assets/qr-code-card-opt.png';  
+import LinkTreeImg from '../assets/pages-card-opt.png';
 
 function Home() {
   const productImages = [
@@ -15,6 +15,18 @@ function Home() {
     QRCode,
     LinkTreeImg,
   ];
+  const titles=[
+    "URL Shortner",
+    "QR Code Generator",
+    "Personalized Pages/LinkTree"
+  ];
+  const descriptions=[
+    "Shorten your long URL to a short one with our URL Shortner. It's fast and easy to use.",
+    "Generate QR Codes for your website, social media, and more with our QR Code Generator.",
+    "Create a personalized page with all your social media links in one place with our LinkTree alternative."
+  ];
+    
+  
 
   return (
     <>
@@ -25,10 +37,12 @@ function Home() {
         <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
           <div class="max-w-screen-md">
             <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">
-              Let's find more that brings us together.
+            Great Connections Start with a click OR SCAN
+
+              The SGGS Platform
             </h2>
             <p class="mb-8 font-light text-gray-500 sm:text-xl dark:text-gray-400">
-              Flowbite helps you connect with friends, family and communities of people who share your interests. Connecting with your friends and family as well as discovering new ones is easy with features like Groups, Watch and Marketplace.
+            All the products you need to build brand connections, manage links and QR Codes, and connect with audiences everywhere, in a single unified platform.
             </p>
             <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
               <a href="#" class="inline-flex items-center justify-center px-4 py-2.5 text-base font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900">
@@ -44,9 +58,9 @@ function Home() {
           </div>
         </div>
 
-        <div class="flex flex-wrap justify-center bg-gray-900 gap-2">
+        <div class="flex flex-wrap justify-center bg-white dark:bg-gray-900 gap-2">
           {productImages.map((img, index) => (
-            <ProductCard key={index} img={img} />
+            <ProductCard key={index} img={img} title={titles[index]} description={descriptions[index]}/>
           ))}
         </div>
       </section>

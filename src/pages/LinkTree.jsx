@@ -255,7 +255,7 @@ function LinkTree() {
     };
 
     return (
-        <div className="p-4 bg-gray-100 dark:bg-gray-800 min-h-screen">
+        <div className="p-4 bg-gray-100 dark:bg-gray-900 min-h-screen">
             <h2 className="text-xl text-center font-bold text-gray-900 dark:text-white">Public Profile</h2>
 
             {error && <p className="text-red-600 text-center">{error}</p>}
