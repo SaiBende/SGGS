@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { QRCodeCanvas } from 'qrcode.react';
 
 function Dashboard() {
     const [userData, setUserData] = useState(null);
@@ -15,14 +16,14 @@ function Dashboard() {
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("Authorization", token);
             // myHeaders.append("Access-Control-Allow-Origin", "localhost:8000");
-           
+
             const requestOptions = {
-               
+
                 method: 'POST',
                 credentials: 'include', // Include cookies in the request
                 redirect: 'follow',
                 headers: myHeaders,
-                
+
             };
 
             fetch(`${import.meta.env.VITE_API_URL}/user/dashboard`, requestOptions)
@@ -90,6 +91,7 @@ function Dashboard() {
                                 <th className="py-2 sm:py-3 px-4 sm:px-6 text-left">Redirect URL</th>
                                 <th className="py-2 sm:py-3 px-4 sm:px-6 text-left">Visits</th>
                                 <th className="py-2 sm:py-3 px-4 sm:px-6 text-left">Created At</th>
+                                <th className="py-2 sm:py-3 px-4 sm:px-6 text-left">QR Codes</th>
                             </tr>
                         </thead>
                         <tbody className="text-gray-700">
@@ -113,6 +115,27 @@ function Dashboard() {
                                     <td className="py-2 sm:py-3 px-4 sm:px-6">{url.visitHistory.length}</td>
                                     <td className="py-2 sm:py-3 px-4 sm:px-6">
                                         {new Date(url.createdAt).toLocaleDateString()}
+                                    </td>
+                                    <td className="py-2 sm:py-3 px-4 sm:px-6">
+                                        <QRCodeCanvas
+                                            id="qrcode"
+                                            value={`${import.meta.env.VITE_FRONTEND_URL}/${url.shortId}`}
+                                            size={128}
+                                            bgColor={"#ffffff"}
+                                            fgColor={"#000000"}
+                                            level={"H"}
+                                            className=''
+                                            imageSettings={{
+                                                src: "https://res.cloudinary.com/sggs/image/upload/v1731136210/user_profile_photos/logo_yqftnr.png",
+                                                x: undefined,
+                                                y: undefined,
+                                                height: 24,
+                                                width: 24,
+                                                opacity: 1,
+                                                excavate: true,
+                                            }}
+                                            includeMargin={false}
+                                        />
                                     </td>
                                 </tr>
                             ))}

@@ -186,11 +186,20 @@ function InputCardLink() {
                         <QRCodeCanvas
                             id="qrcode"
                             value={shortenedURL}
-                            size={200}
+                            size={128}
                             bgColor={"#ffffff"}
                             fgColor={"#000000"}
                             level={"H"}
                             className=''
+                            imageSettings={{
+                                src: "https://res.cloudinary.com/sggs/image/upload/v1731136210/user_profile_photos/logo_yqftnr.png",
+                                x: undefined,
+                                y: undefined,
+                                height: 24,
+                                width: 24,
+                                opacity: 1,
+                                excavate: true,
+                              }}
                             includeMargin={false}
                         />
                         <button
