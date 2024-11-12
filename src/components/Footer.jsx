@@ -47,7 +47,7 @@ function Footer() {
                             <a href="#" className="mr-4 hover:underline md:mr-6">Contact</a>
                         </li>
                     </ul>
-                    <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2021-2022 <a href="#" className="hover:underline">Flowbite™</a>. All Rights Reserved.</span>
+                    <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2024-2025 <a href="https://sggs.me" className="hover:underline">SGGS™ </a>. All Rights Reserved by <a href='https://saibende.tech' target="_blank" rel="noopener noreferrer">saibende.tech</a></span>
                 </div>
             </footer>
         </>

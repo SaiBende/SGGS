@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 
-function InputCardLink() {
+function ShortenLink() {
     const [longURL, setLongURL] = useState('');
     const [customURL, setCustomURL] = useState('');
     const [loading, setLoading] = useState(false); // State to handle loading
@@ -86,12 +86,12 @@ function InputCardLink() {
 
     return (
         <>
-            <section className='bg-gray-50 dark:bg-gray-900 p-2'>
+            <section className=' flex flex-col items-center  bg-gray-50 dark:bg-gray-900 '>
                 <h2 className="text-3xl text-center font-bold leading-tight tracking-tight text-gray-900 md:text-2xl xl:text-3xl dark:text-white p-2">
                     Shorten Your Loooooooooong URL
                 </h2>
 
-                <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
+                <form className="bg-white shadow-md rounded-lg p-6 w-full max-w-md dark:bg-gray-800 dark:text-gray-100" onSubmit={handleSubmit}>
                     <div className="mb-5">
                         <label htmlFor="longurl" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Enter Long URL</label>
                         <input
@@ -216,4 +216,4 @@ function InputCardLink() {
     );
 }
 
-export default InputCardLink;
+export default ShortenLink;

@@ -5,9 +5,8 @@ import './App.css'
 import Navigationbar from './components/Navigationbar'
 import Register from './components/Register'
 import Login from './components/Login'
-import InputCardLink from './components/InputCardLink'
-import Hero from './components/Hero'
-import Footer from './components/Footer'
+
+
 import ProfileCard from './publicprofile/ProfileCard'
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -19,6 +18,8 @@ import Pricing from './pages/Pricing'
 import Dashboard from './pages/Dashboard'
 import Home from './pages/Home'
 import RedirectURL from './components/RedirectURL'
+import ShortenLink from './components/ShortenLink'
+import QRGenerate from './components/QRGenerate'
 
 
 function App() {
@@ -30,12 +31,14 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<><Home /></>} />
-            <Route path="inputlink" element={<InputCardLink />} />
+            <Route path="shortenlink" element={<ShortenLink />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="about" element={<About />} />
             <Route path="services" element={<Services />} />
             <Route path="linktree" element={<LinkTree />} />
+            <Route path="qrgenerate" element={<QRGenerate />} />
+
 
             <Route path="pricing" element={<Pricing />} />
             <Route path="dashboard" element={<Dashboard />} />

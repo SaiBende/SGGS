@@ -5,6 +5,7 @@ function Dashboard() {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -73,7 +74,7 @@ function Dashboard() {
                                 <td className="py-2 sm:py-3 px-4 sm:px-6">{userData.user.username}</td>
                                 <td className="py-2 sm:py-3 px-4 sm:px-6">{userData.user.email}</td>
                                 <td className="py-2 sm:py-3 px-4 sm:px-6">{userData.user.category}</td>
-                                <td className="py-2 sm:py-3 px-4 sm:px-6">{userData.user.urlCount}/10</td>
+                                <td className="py-2 sm:py-3 px-4 sm:px-6">{userData.user.urlCount}</td>
                             </tr>
                         </tbody>
                     </table>
