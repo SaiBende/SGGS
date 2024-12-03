@@ -8,7 +8,7 @@ import Login from './components/Login'
 
 
 import ProfileCard from './publicprofile/ProfileCard'
-import ReactDOM from "react-dom/client";
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from './Layout'
 import About from './pages/About'
@@ -20,6 +20,7 @@ import Home from './pages/Home'
 import RedirectURL from './components/RedirectURL'
 import ShortenLink from './components/ShortenLink'
 import QRGenerate from './components/QRGenerate'
+
 
 
 function App() {

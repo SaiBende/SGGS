@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { QRCodeCanvas } from 'qrcode.react';
+import { Link } from "react-router-dom";
+
 
 function Dashboard() {
     const [userData, setUserData] = useState(null);
@@ -53,9 +55,9 @@ function Dashboard() {
     }
 
     return (
-        <div className="container mx-auto p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6">User Dashboard</h1>
-
+        <div className="container mx-auto p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 bg-white dark:bg-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6">User Dashboard with {userData.user.category} Category</h1>
+            <span>To Upgrade </span><Link className="text-blue-500 text-sm" to='/pricing'>click here</Link>
             {/* User Information */}
             <div className="mb-6">
                 <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2">User Information</h2>

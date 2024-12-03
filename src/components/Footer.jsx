@@ -23,22 +23,10 @@ function Footer() {
                         <img src="/logo.png" alt="Flowbite" className="mr-2 h-8" />
                         URL Web Services
                     </a>
-                    <p className="my-6 text-gray-500 dark:text-gray-400">Open-source library of over 400+ web components and interactive elements built for better web.</p>
+                    <p className="my-6 text-gray-500 dark:text-gray-400">Your SGGS URL web Service with 100+ happy users</p>
                     <ul className="flex flex-wrap justify-center items-center mb-6 text-gray-900 dark:text-white">
                         <li>
                             <a href="#" className="mr-4 hover:underline md:mr-6 ">About</a>
-                        </li>
-                        <li>
-                            <a href="#" className="mr-4 hover:underline md:mr-6">Premium</a>
-                        </li>
-                        <li>
-                            <a href="#" className="mr-4 hover:underline md:mr-6 ">Campaigns</a>
-                        </li>
-                        <li>
-                            <a href="#" className="mr-4 hover:underline md:mr-6">Blog</a>
-                        </li>
-                        <li>
-                            <a href="#" className="mr-4 hover:underline md:mr-6">Affiliate Program</a>
                         </li>
                         <li>
                             <a href="#" className="mr-4 hover:underline md:mr-6">FAQs</a>
@@ -47,7 +35,7 @@ function Footer() {
                             <a href="#" className="mr-4 hover:underline md:mr-6">Contact</a>
                         </li>
                     </ul>
-                    <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2024-2025 <a href="https://sggs.me" className="hover:underline">SGGS™ </a>. All Rights Reserved by <a href='https://saibende.tech' target="_blank" rel="noopener noreferrer">saibende.tech</a></span>
+                    <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2024-2025 <a href="https://sggs.me" className="hover:underline"> SGGS™ </a>. All Rights Reserved by <a href='https://saibende.tech' target="_blank" rel="noopener noreferrer">saibende.tech</a></span>
                 </div>
             </footer>
         </>
