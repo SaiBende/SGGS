@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import { use } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 
 function Login() {
@@ -7,6 +8,20 @@ function Login() {
     const [errorMessage, setErrorMessage] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const navigate = useNavigate(); // Hook for navigation
+   
+    // how to know  user is already logged in or not
+    // if logged in then redirect to dashboard
+    // if not logged in then show login page
+    // if user is logged in then token will be stored in local storage
+    // if token is present in local storage then redirect to dashboard
+    // if token is not present in local storage then show login page
+    //write this code 
+    // useEffect(() => {
+    //     const alreadytoken = localStorage.getItem('token');
+    //     if (alreadytoken) {
+    //         navigate('/dashboard');
+    //     }
+    // });
 
     const handleSubmit = async (event) => {
         event.preventDefault(); // Prevent page refresh
