@@ -20,7 +20,9 @@ import Home from './pages/Home'
 import RedirectURL from './components/RedirectURL'
 import ShortenLink from './components/ShortenLink'
 import QRGenerate from './components/QRGenerate'
-
+import Success from './components/Success'
+import Cancel from './components/Cancel'
+import Return from './components/Return'
 
 
 function App() {
@@ -43,7 +45,10 @@ function App() {
 
             <Route path="pricing" element={<Pricing />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="success" element={<Success />} />
+            <Route path="cancel" element={<Cancel />} />
             <Route  path=":shortId" element={<RedirectURL/>}/>
+            <Route path='payment/session-status/return' element={<Return/>}/>
             {/* <Route path="*" element={<NoPage />} /> */}
           </Route>
           <Route path='/u'>
