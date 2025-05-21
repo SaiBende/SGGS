@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';  // Import useNavigate for routing
+import { toast } from 'react-toastify';
 
 function Register() {
   // State for form inputs
@@ -44,6 +45,7 @@ function Register() {
       if (response.ok) {
         // Success - show success message and redirect
         setSuccessMessage('Registration successful! Redirecting to login...');
+        toast.success('Registration successful! Redirecting to login...');
         setErrorMessage(null);
 
         // Redirect to login page after 2 seconds
@@ -52,11 +54,14 @@ function Register() {
         }, 2000);
       } else {
         // Handle error response from backend
-        setErrorMessage(result.message || 'Registration failed. Please try again.');
+        toast(result.error );
+        setErrorMessage(result.error || 'Registration failed. Please try again.');
+        
         setSuccessMessage(null);
       }
     } catch (error) {
       console.error('Error:', error);
+      toast(error);
       setErrorMessage('There was an issue with registration.');  // Show error message
       setSuccessMessage(null);
     }

@@ -1,8 +1,8 @@
 
-import reactLogo from './assets/react.svg'
+
 
 import './App.css'
-import Navigationbar from './components/Navigationbar'
+
 import Register from './components/Register'
 import Login from './components/Login'
 
@@ -23,6 +23,7 @@ import QRGenerate from './components/QRGenerate'
 import Success from './components/Success'
 import Cancel from './components/Cancel'
 import Return from './components/Return'
+import { ToastContainer } from 'react-toastify';
 
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
           
           
         </Routes>
+        <ToastContainer />
       </BrowserRouter>
       {/* <Navigationbar/>
       <Hero/>

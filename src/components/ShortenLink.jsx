@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
+import { toast } from 'react-toastify';
 
 function ShortenLink() {
     const [longURL, setLongURL] = useState('');
@@ -47,8 +48,10 @@ function ShortenLink() {
                     setLoading(false); // Stop loading
                     if (result.id) {
                         const newURL = `${import.meta.env.VITE_FRONTEND_URL}/${result.id}`;
+                        toast.success('URL shortened successfully!');
                         setShortenedURL(newURL); // Store the shortened URL
                     } else {
+                        toast.error(result.error);
                         setError("Failed to generate URL");
                     }
                 })
@@ -64,6 +67,7 @@ function ShortenLink() {
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(shortenedURL).then(() => {
+            toast.success('URL copied to clipboard!');
             setCopySuccess('URL copied!');
         }).catch(() => {
             setCopySuccess('Failed to copy');

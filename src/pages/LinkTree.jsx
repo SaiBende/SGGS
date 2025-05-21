@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 
 function LinkTree() {
@@ -143,6 +144,7 @@ function LinkTree() {
             .then((result) => {
                 if (result.success) {
                     setSuccessMessage('Profile photo uploaded successfully.');
+                    toast.success('Profile photo uploaded successfully.');
                     // Optionally update the user object to reflect the new photo
                     setUser((prevUser) => ({
                         ...prevUser,
@@ -152,6 +154,7 @@ function LinkTree() {
                     //console.log(profilephotoUrl);
                 } else {
                     setError(result.error || 'Failed to upload profile photo.');
+                    toast.error(result.error || 'Failed to upload profile photo.');
                 }
             })
             .catch((error) => {
@@ -169,6 +172,7 @@ function LinkTree() {
         const token = localStorage.getItem('token');
         if (!token) {
             setError('Please log in to add social media links.');
+            toast.error('Please log in to add social media links.');
             return;
         }
 
@@ -196,9 +200,12 @@ function LinkTree() {
                     setSocialMediaLinks(result.socialMediaLinks);
                     setNewPlatform('');
                     setNewLink('');
+                    
                     setSuccessMessage(`${newPlatform} link added successfully.`);
+                    toast.success(`${newPlatform} link added successfully.`);
                 } else {
                     setError(result.error || 'Failed to add social media link.');
+                    toast.error(result.error || 'Failed to add social media link.');
                 }
             })
             .catch((error) => {
@@ -233,17 +240,21 @@ function LinkTree() {
             .then((response) => {
                 if (!response.ok) {
                     return response.json().then((error) => {
+                        toast.error(error.error || 'Failed to delete social media link.');
                         throw new Error(error.error || 'Failed to delete social media link.');
                     });
                 }
+            
                 return response.json();
             })
             .then((result) => {
                 if (result.success) {
                     setSocialMediaLinks(result.socialMediaLinks);
                     setSuccessMessage(`${platform} link deleted successfully.`);
+                    toast.success(`${platform} link deleted successfully.`);
                 } else {
                     setError(result.error || 'Failed to delete social media link.');
+                    toast.error(result.error);
                 }
             })
             .catch((error) => {
@@ -277,8 +288,10 @@ function LinkTree() {
             .then((result) => {
                 if (result.success) {
                     setSuccessMessage('Description updated successfully.');
+                    toast.success("Description updated successfully.");
                 } else {
                     setError(result.error || 'Failed to update description.');
+                    toast.error(result.error || 'Failed to update description.');
                 }
             })
             .catch((error) => {
@@ -290,7 +303,10 @@ function LinkTree() {
     const profileUrl = `${import.meta.env.VITE_FRONTEND_URL}/u/${username}`;
     const copyToClipboard = () => {
         navigator.clipboard.writeText(profileUrl)
-            .then(() => alert('URL copied to clipboard!'))
+            .then(() => {
+                alert('URL copied to clipboard!');
+                toast.success('URL copied to clipboard!');
+            })
             .catch(err => console.error('Failed to copy URL: ', err));
     };
 

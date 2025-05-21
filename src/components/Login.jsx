@@ -1,6 +1,8 @@
-import React, { useState,useEffect } from 'react';
-import { use } from 'react';
+
+import  { useState } from 'react';
+
 import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate for routing
+import { toast } from 'react-toastify';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -9,19 +11,7 @@ function Login() {
     const [successMessage, setSuccessMessage] = useState(null);
     const navigate = useNavigate(); // Hook for navigation
    
-    // how to know  user is already logged in or not
-    // if logged in then redirect to dashboard
-    // if not logged in then show login page
-    // if user is logged in then token will be stored in local storage
-    // if token is present in local storage then redirect to dashboard
-    // if token is not present in local storage then show login page
-    //write this code 
-    // useEffect(() => {
-    //     const alreadytoken = localStorage.getItem('token');
-    //     if (alreadytoken) {
-    //         navigate('/dashboard');
-    //     }
-    // });
+
 
     const handleSubmit = async (event) => {
         event.preventDefault(); // Prevent page refresh
@@ -29,6 +19,7 @@ function Login() {
         // Basic validation
         if (!email || !password) {
             setErrorMessage('All fields are required');
+            toast.error('All fields are required');
             return;
         }
 
@@ -52,6 +43,7 @@ function Login() {
 
             if (response.ok) {
                 // Successful login
+                toast.success('Login successful! Redirecting...');
                 setSuccessMessage('Login successful! Redirecting...');
                 setErrorMessage(null);
 
@@ -67,6 +59,7 @@ function Login() {
                 // Handle error response from backend
                 setErrorMessage(result.message || 'Login failed. Please try again.');
                 setSuccessMessage(null);
+                toast.error(result.message);
             }
         } catch (error) {
             console.error('Error:', error);

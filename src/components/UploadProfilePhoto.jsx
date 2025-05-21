@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
+import { toast } from 'react-toastify';
 
 function FileUpload() {
     const [selectedFile, setSelectedFile] = useState(null);
@@ -11,6 +12,7 @@ function FileUpload() {
     // Function to handle file upload
     const handleFileUpload = async () => {
         if (!selectedFile) {
+            toast.error('Please select a file first.');
             alert('Please select a file first.');
             return;
         }
@@ -31,6 +33,7 @@ function FileUpload() {
             // Handle the response
             const result = await response.json();
             if (response.ok) {
+                toast.success('File uploaded successfully!');
                 alert('File uploaded successfully.');
             } else {
                 alert(`Error: ${result.message || 'Failed to upload file.'}`);

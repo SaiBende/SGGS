@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function Navigationbar() {
     const [user, setUser] = useState(null);
@@ -53,6 +54,7 @@ function Navigationbar() {
     const handleLogout = () => {
         localStorage.removeItem('token');
         setUser(null);
+        toast.success('Logout successful!');
         navigate('/');
     };
 
