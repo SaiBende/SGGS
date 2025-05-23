@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { QRCodeCanvas } from 'qrcode.react';
+import { useState, useRef } from 'react';
+import { QRCode } from 'react-qrcode-logo';
 
 function QRCodeGenerator() {
     const [url, setUrl] = useState('');
@@ -11,7 +11,16 @@ function QRCodeGenerator() {
     const [logoSrc, setLogoSrc] = useState(null);
     const [logoWidth, setLogoWidth] = useState(24);
     const [logoHeight, setLogoHeight] = useState(24);
+    const [logoOpacity, setLogoOpacity] = useState(1);
+    const [removeQrCodeBehindLogo, setRemoveQrCodeBehindLogo] = useState(false);
+    const [logoPadding, setLogoPadding] = useState(0);
+    const [logoPaddingStyle, setLogoPaddingStyle] = useState("square");
+    const [qrStyle, setQrStyle] = useState("squares");
+    const [quietZone, setQuietZone] = useState(10);
+    const [enableCORS, setEnableCORS] = useState(false);
+    const [id, setId] = useState("react-qrcode-logo");
     const [qrGenerated, setQrGenerated] = useState(false);
+
     const qrCodeRef = useRef(null);
 
     const handleImageUpload = (event) => {
@@ -28,27 +37,17 @@ function QRCodeGenerator() {
     const generateQRCode = (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
-
-        if(!token) {
+        if (!token) {
             window.location.href = "/register";
         }
-
-
         setQrGenerated(true);
     };
 
     const downloadQRCode = () => {
-        const canvas = qrCodeRef.current?.querySelector('canvas');
-        if (canvas) {
-            const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-            const downloadLink = document.createElement("a");
-            downloadLink.href = pngUrl;
-            downloadLink.download = "qrcode.png";
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
+        if (qrCodeRef.current) {
+            qrCodeRef.current.download('png', 'qrcode.png');
         } else {
-            console.error("Canvas element not found");
+            console.error("QRCode ref not found");
         }
     };
 
@@ -152,6 +151,92 @@ function QRCodeGenerator() {
                     />
                 </div>
 
+                <div>
+                    <label className="block text-sm font-medium mb-2">Logo Opacity:</label>
+                    <input 
+                        type="number" 
+                        min="0" max="1" step="0.01"
+                        value={logoOpacity}
+                        onChange={(e) => setLogoOpacity(Number(e.target.value))}
+                        className="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Remove QR Behind Logo:</label>
+                    <input 
+                        type="checkbox"
+                        checked={removeQrCodeBehindLogo}
+                        onChange={(e) => setRemoveQrCodeBehindLogo(e.target.checked)}
+                        className="mr-2"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Logo Padding:</label>
+                    <input 
+                        type="number"
+                        value={logoPadding}
+                        onChange={(e) => setLogoPadding(Number(e.target.value))}
+                        className="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Logo Padding Style:</label>
+                    <select
+                        value={logoPaddingStyle}
+                        onChange={(e) => setLogoPaddingStyle(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    >
+                        <option value="square">Square</option>
+                        <option value="circle">Circle</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">QR Style:</label>
+                    <select
+                        value={qrStyle}
+                        onChange={(e) => setQrStyle(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    >
+                        <option value="squares">Squares</option>
+                        <option value="dots">Dots</option>
+                        <option value="fluid">Fluid</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Quiet Zone (px):</label>
+                    <input 
+                        type="number"
+                        value={quietZone}
+                        onChange={(e) => setQuietZone(Number(e.target.value))}
+                        className="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Enable CORS:</label>
+                    <input 
+                        type="checkbox"
+                        checked={enableCORS}
+                        onChange={(e) => setEnableCORS(e.target.checked)}
+                        className="mr-2"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Custom QR ID:</label>
+                    <input 
+                        type="text"
+                        value={id}
+                        onChange={(e) => setId(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                </div>
+
                 <button 
                     type="button" 
                     onClick={generateQRCode} 
@@ -171,22 +256,29 @@ function QRCodeGenerator() {
             </form>
 
             {qrGenerated && (
-                <div ref={qrCodeRef} className="relative mt-6 p-4 bg-white rounded-lg shadow-md dark:bg-gray-800 dark:text-gray-100"
+                <div className="relative mt-6 p-4 bg-white rounded-lg shadow-md dark:bg-gray-800 dark:text-gray-100"
                     onContextMenu={(e) => e.preventDefault()} // Disable right-click
                 >
-                    <QRCodeCanvas
+                    <QRCode
+                        ref={qrCodeRef}
                         value={url}
-                        title={title}
+                        ecLevel={level}
                         size={size}
+                        quietZone={quietZone}
                         bgColor={bgColor}
                         fgColor={fgColor}
-                        level={level}
-                        imageSettings={{
-                            src: logoSrc,
-                            height: logoHeight,
-                            width: logoWidth,
-                            excavate: true,
-                        }}
+                        logoImage={logoSrc}
+                        logoWidth={logoWidth}
+                        logoHeight={logoHeight}
+                        logoOpacity={logoOpacity}
+                        removeQrCodeBehindLogo={removeQrCodeBehindLogo}
+                        logoPadding={logoPadding}
+                        logoPaddingStyle={logoPaddingStyle}
+                        qrStyle={qrStyle}
+                        enableCORS={enableCORS}
+                        id={id}
+                        style={{ margin: "0 auto" }}
+                        // You can add eyeRadius, eyeColor, logoOnLoad, etc. as needed
                     />
                 </div>
             )}
