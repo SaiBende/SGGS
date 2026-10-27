@@ -6,7 +6,7 @@ import ForgotPassword from './components/ForgotPassword';
 
 import ProfileCard from './publicprofile/ProfileCard';
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './Layout';
 import About from './pages/About';
 import Services from './pages/Services';
@@ -17,7 +17,6 @@ import Home from './pages/Home';
 import ShortenLinkPage from './pages/ShortenLinkPage';
 import RedirectURL from './components/RedirectURL';
 import QRGenerate from './components/QRGenerate';
-import Return from './components/Return';
 import NotFound from './components/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -69,7 +68,8 @@ function App() {
               }
             />
             <Route path=":shortId" element={<RedirectURL />} />
-            <Route path="payment/session-status/return" element={<Return />} />
+            {/* Old Stripe return links now land on the Clerk billing page. */}
+            <Route path="payment/session-status/return" element={<Navigate to="/pricing" replace />} />
             <Route path="*" element={<NotFound />} />
           </Route>
           <Route path="/u">

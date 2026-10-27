@@ -1,3 +1,4 @@
+// Legacy Stripe return page. Not routed by the app. See ./README.md.
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import {
@@ -9,12 +10,12 @@ import {
   Mail,
   ShieldCheck,
 } from 'lucide-react';
-import { apiFetch } from '../utils/auth';
-import Loading from './Loading';
-import { BackgroundBeams } from './ui/background-beams';
-import { GridPattern } from './ui/grid-pattern';
-import { Badge } from './ui/badge';
-import { buttonVariants } from './ui/button';
+import { apiFetch } from '../../utils/auth';
+import Loading from '../../components/Loading';
+import { BackgroundBeams } from '../../components/ui/background-beams';
+import { GridPattern } from '../../components/ui/grid-pattern';
+import { Badge } from '../../components/ui/badge';
+import { buttonVariants } from '../../components/ui/button';
 
 function StatusShell({ icon, badge, title, description, children }) {
   return (

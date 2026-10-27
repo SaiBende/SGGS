@@ -43,3 +43,28 @@ export const clerkAppearance = {
     alertText: 'text-[13px]',
   },
 };
+
+// Shared theme for Clerk Billing: the pricing table, checkout drawer and the
+// subscription manager drawer.
+export const clerkBillingAppearance = {
+  variables: {
+    colorPrimary: '#5b4ae8',
+    colorBackground: '#ffffff',
+    colorText: '#0b0b10',
+    colorTextSecondary: '#6b6b74',
+    colorInputBackground: '#fbfbf8',
+    colorInputText: '#0b0b10',
+    colorNeutral: '#0b0b10',
+    borderRadius: '0.875rem',
+    fontFamily: "'Inter Variable', Inter, ui-sans-serif, system-ui, sans-serif",
+    fontSize: '13px',
+  },
+  elements: {
+    rootBox: 'w-full',
+    card: 'rounded-2xl border border-ink/10 shadow-card',
+    headerTitle: 'font-display tracking-[-0.03em]',
+    headerSubtitle: 'text-muted',
+    formButtonPrimary:
+      'bg-brand-600 hover:bg-brand-700 text-white shadow-none',
+  },
+};

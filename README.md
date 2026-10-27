@@ -4,8 +4,8 @@
 This is the **frontend** for SGGS — **Shorten, Generate, Group & Share** — a
 link studio for shortening URLs, generating branded QR codes, grouping your
 links in one place, and sharing them from a LinkTree-style public profile. It
-pairs a React + Vite app with Clerk authentication, click analytics and one-time
-Stripe plans.
+pairs a React + Vite app with Clerk authentication, click analytics and
+Clerk Billing subscriptions.
 
 The app is live at **https://sggs.saibende.in**.
 
@@ -22,7 +22,7 @@ Aceternity-style motion and layout primitives — no component-library dependenc
 - **Dashboard:** Search, sort, copy, rename and delete links; open per-link analytics or a downloadable QR code; track plan usage from one workspace.
 - **Analytics:** Per-link visit history rendered as a daily trend chart.
 - **Authentication:** Clerk’s prebuilt sign-in/sign-up UI, email verification, MFA and password reset, themed to match the app.
-- **Payments:** Stripe Checkout for Basic, Standard and Premium plans, with return-page confirmation and plan status on the dashboard.
+- **Payments:** Clerk Billing with monthly and yearly plans, a Clerk-rendered pricing table, and a subscription manager drawer for upgrades, period changes and cancellation.
 - **Responsive design:** Dedicated mobile layouts, a glass navigation bar, custom modals, empty states, loading states and error recovery on every page.
 
 ---
@@ -34,7 +34,7 @@ Aceternity-style motion and layout primitives — no component-library dependenc
 - **Motion & icons:** Framer Motion, Lucide
 - **Fonts:** Inter Variable and Manrope Variable, bundled with Fontsource
 - **Auth:** Clerk (`@clerk/react`)
-- **Payments:** Stripe.js
+- **Payments:** Clerk Billing (`PricingTable`, `SubscriptionDetailsButton`)
 - **QR codes:** `qrcode.react` and `react-qrcode-logo`
 - **Brand helpers:** `src/lib/brand.js` — full name, domain, live short-link base
 - **Analytics:** Chart.js + `react-chartjs-2`
@@ -88,13 +88,15 @@ The visual language lives in `src/index.css` and `tailwind.config.js`:
    ```
    VITE_API_URL=http://localhost:8000/api
    VITE_FRONTEND_URL=http://localhost:5173
-   VITE_STRIPE_PUBLIC_KEY=<your-stripe-public-key>
    VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
    ```
 
    `VITE_CLERK_PUBLISHABLE_KEY` must belong to the same Clerk application as
    the backend's `CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY`. If it is missing,
    the app shows a configuration screen instead of loading.
+
+   `VITE_STRIPE_PUBLIC_KEY` is only needed if you deliberately re-enable the
+   legacy Stripe flow in `src/legacy/stripe/`.
 
 4. **Configure Clerk:**
    - Enable **Email address** + **Password**. Login also supports **Email code**;
@@ -110,6 +112,13 @@ The visual language lives in `src/index.css` and `tailwind.config.js`:
      **Authorized origins**.
    - Optional: enable MFA (email code, authenticator, backup codes, phone code).
    - Optional: rename the Clerk application to **SGGS** for branded headings.
+   - **Billing:** claim the application first (`npx clerk auth login`) if it
+     was created as an accountless development instance; an unclaimed app cannot
+     enable Billing. Then enable Billing for users and create plans with the
+     slugs `free`, `basic`, `standard` and `premium`. Give each paid plan both a
+     **monthly** and a **yearly** price so the pricing table shows the period
+     toggle. The backend owns the slug → quota mapping; see the backend README.
+     Do not mention custom domains in the plan descriptions.
 
 5. **Run the development server:**
    ```sh
@@ -130,6 +139,8 @@ The visual language lives in `src/index.css` and `tailwind.config.js`:
 │   ├── components/
 │   │   └── ui/            # buttons, cards, modals, beams, brand mark, etc.
 │   ├── lib/               # brand helpers, class merging, formatting
+│   ├── legacy/
+│   │   └── stripe/        # inactive Stripe pricing and return pages
 │   ├── pages/             # Home, Dashboard, Pricing, LinkTree, About, ...
 │   ├── publicprofile/     # public /u/:username profile
 │   ├── utils/             # Clerk auth, appearance, redirect helpers
@@ -187,6 +198,28 @@ Protected routes redirect signed-out visitors to `/login` and return them to
 the requested page after authentication.
 
 ---
+
+## Billing
+
+Pricing and checkout are rendered by Clerk Billing:
+
+- `/pricing` embeds Clerk's `<PricingTable />`, which reads the plans, prices,
+  feature lists, monthly/yearly toggle and currency directly from the Clerk
+  Dashboard.
+- Signed-in users can open the `<SubscriptionDetailsButton />` plan manager from
+  the pricing page or the dashboard plan card to change plans, switch between
+  monthly and yearly billing, or cancel.
+- After checkout, Clerk returns to `/dashboard?billing=success`; the dashboard
+  asks the backend to force-sync the new subscription before showing quotas.
+- Plan descriptions are configured in Clerk. Keep them free of custom-domain
+  promises.
+
+> **Currency:** Clerk Billing is currently USD-only and is not available to
+> merchants based in India. The app shows the prices Clerk will actually charge.
+> If INR is required, use the legacy Stripe rail in `src/legacy/stripe/` or add
+> an INR-capable gateway such as Razorpay.
+
+The old Stripe pages are preserved in `src/legacy/stripe/` and are not routed.
 
 ## Backend URL
 

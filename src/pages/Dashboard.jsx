@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { SubscriptionDetailsButton } from "@clerk/react/experimental";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -20,6 +21,7 @@ import {
   Plus,
   QrCode,
   Search,
+  Settings2,
   Sparkles,
   Trash2,
   TrendingUp,
@@ -27,11 +29,13 @@ import {
   Wallet,
 } from "lucide-react";
 import { apiFetch } from "../utils/auth";
+import { clerkBillingAppearance } from "../utils/clerkAppearance";
 import { cn } from "../lib/utils";
 import { shortDomain, shortUrl } from "../lib/brand";
 import VisitTrends from "../components/VisitTrends";
 import Loading from "../components/Loading";
 import ErrorState from "../components/ErrorState";
+import BillingBoundary from "../components/BillingBoundary";
 import { Button, buttonVariants } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { StatCard } from "../components/ui/stat-card";
@@ -209,11 +213,34 @@ function LinkRow({
 }
 
 function PlanCard({ user, linkCount, className }) {
-  const limit = planLimits[user.category] ?? 10;
+  const plan = user.plan || {};
+  const fallbackLimit = planLimits[plan.category || user.category] ?? 10;
+  const limit = plan.unlimited ? Infinity : user.urlLimit ?? fallbackLimit;
   const isUnlimited = limit === Infinity;
   const usage = isUnlimited ? 0 : Math.min(100, (linkCount / limit) * 100);
-  const paid = Boolean(user.planExpiresAt) || user.category !== "basic";
-  const planName = user.category === "basic" && !paid ? "Free" : capitalize(user.category);
+  const canManage = plan.source === "clerk";
+  const planName = plan.name || (user.category === "basic" && !user.planExpiresAt ? "Free" : capitalize(user.category));
+
+  let statusLine = "Free plan · Upgrade for more room.";
+
+  if (plan.source === "clerk") {
+    if (plan.status === "past_due") {
+      statusLine = "Payment past due · Update it in the plan manager.";
+    } else if (plan.cancelAtPeriodEnd) {
+      statusLine = `Cancels on ${formatDate(plan.currentPeriodEnd, { month: "short", day: "numeric", year: "numeric" })}`;
+    } else if (plan.currentPeriodEnd) {
+      const periodLabel = plan.period === "year" ? "Yearly" : plan.period === "month" ? "Monthly" : "Subscription";
+      statusLine = `${periodLabel} · renews ${formatDate(plan.currentPeriodEnd, { month: "short", day: "numeric", year: "numeric" })}`;
+    } else {
+      statusLine = plan.status === "canceled" ? "Canceled at period end" : "Managed by Clerk Billing";
+    }
+  } else if (plan.source === "legacy" && plan.currentPeriodEnd) {
+    statusLine = `Active until ${formatDate(plan.currentPeriodEnd, { month: "short", day: "numeric", year: "numeric" })}`;
+  } else if (plan.source === "legacy") {
+    statusLine = "Legacy plan · active";
+  } else if (user.planExpiresAt) {
+    statusLine = `Active until ${formatDate(user.planExpiresAt, { month: "short", day: "numeric", year: "numeric" })}`;
+  }
 
   return (
     <div className={cn("relative overflow-hidden rounded-2xl border border-ink/10 bg-ink p-5 text-white", className)}>
@@ -245,17 +272,28 @@ function PlanCard({ user, linkCount, className }) {
             style={{ width: isUnlimited ? "100%" : `${Math.max(4, usage)}%` }}
           />
         </div>
-        <p className="mt-3 text-[10px] leading-4 text-white/35">
-          {user.planExpiresAt
-            ? `Active until ${formatDate(user.planExpiresAt, { month: "short", day: "numeric", year: "numeric" })}`
-            : "Free plan · Upgrade for more room."}
-        </p>
-        <Link
-          to="/pricing"
-          className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/15 bg-white/[0.07] py-2 text-[11px] font-semibold text-white transition hover:bg-white/[0.12]"
-        >
-          {user.category === "premium" ? "Manage plan" : "Upgrade plan"} <ArrowUpRight className="h-3 w-3" />
-        </Link>
+        <p className="mt-3 text-[10px] leading-4 text-white/35">{statusLine}</p>
+        {canManage ? (
+          <BillingBoundary fallback={null}>
+            <SubscriptionDetailsButton
+              subscriptionDetailsProps={{ appearance: clerkBillingAppearance }}
+            >
+              <button
+                type="button"
+                className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/15 bg-white/[0.07] py-2 text-[11px] font-semibold text-white transition hover:bg-white/[0.12]"
+              >
+                <Settings2 className="h-3 w-3" /> Manage plan
+              </button>
+            </SubscriptionDetailsButton>
+          </BillingBoundary>
+        ) : (
+          <Link
+            to="/pricing"
+            className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/15 bg-white/[0.07] py-2 text-[11px] font-semibold text-white transition hover:bg-white/[0.12]"
+          >
+            {plan.source === "legacy" ? "View plans" : "Upgrade plan"} <ArrowUpRight className="h-3 w-3" />
+          </Link>
+        )}
       </div>
     </div>
   );
@@ -401,23 +439,52 @@ function Dashboard() {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const navigate = useNavigate();
+  const shouldRefreshBilling = useMemo(
+    () => new URLSearchParams(window.location.search).get("billing") === "success",
+    []
+  );
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await apiFetch("/user/dashboard", { method: "POST" });
-      if (response.status === 401) {
-        navigate("/login");
-        return;
+      const query = shouldRefreshBilling ? "?refreshBilling=1" : "";
+      const attempts = shouldRefreshBilling ? 3 : 1;
+      let result = null;
+
+      for (let attempt = 0; attempt < attempts; attempt += 1) {
+        const response = await apiFetch(`/user/dashboard${query}`, { method: "POST" });
+        if (response.status === 401) {
+          navigate("/login");
+          return;
+        }
+
+        result = await response.json();
+        if (!result.success) {
+          throw new Error(result.error || "Failed to load user data.");
+        }
+
+        // Clerk can take a moment to expose a brand-new subscription.
+        if (!shouldRefreshBilling || result.user?.plan?.source === "clerk") {
+          break;
+        }
+
+        if (attempt < attempts - 1) {
+          await new Promise((resolve) => window.setTimeout(resolve, 1200 * (attempt + 1)));
+        }
       }
 
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || "Failed to load user data.");
-      }
       setUserData(result);
+
+      if (shouldRefreshBilling) {
+        if (result?.user?.plan?.source === "clerk") {
+          toast.success("Subscription updated");
+        } else {
+          toast.info("Billing status refreshed. If your plan is still missing, reopen this page in a moment.");
+        }
+        window.history.replaceState({}, "", window.location.pathname);
+      }
     } catch (err) {
       console.error("Error fetching user data:", err);
       setError(
@@ -428,7 +495,7 @@ function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, shouldRefreshBilling]);
 
   useEffect(() => {
     loadDashboard();
@@ -459,7 +526,28 @@ function Dashboard() {
     () => urls.reduce((sum, url) => sum + (url.visitHistory?.length || 0), 0),
     [urls]
   );
-  const limit = planLimits[user?.category] ?? 10;
+  const limit = user?.plan?.unlimited
+    ? Infinity
+    : user?.urlLimit ?? planLimits[user?.category] ?? 10;
+  const planValue =
+    user?.plan?.name ||
+    (user?.category === "basic" && !user?.planExpiresAt
+      ? "Free"
+      : capitalize(user?.category));
+  const planHint =
+    user?.plan?.source === "clerk"
+      ? user.plan.status === "past_due"
+        ? "Payment past due"
+        : user.plan.cancelAtPeriodEnd
+          ? `Cancels ${formatDate(user.plan.currentPeriodEnd, { month: "short", day: "numeric" })}`
+          : `${user.plan.period === "year" ? "Yearly" : user.plan.period === "month" ? "Monthly" : "Subscription"}${user.plan.currentPeriodEnd ? ` · renews ${formatDate(user.plan.currentPeriodEnd, { month: "short", day: "numeric" })}` : ""}`
+      : user?.plan?.source === "legacy"
+        ? user.plan.currentPeriodEnd
+          ? `Until ${formatDate(user.plan.currentPeriodEnd, { month: "short", day: "numeric" })}`
+          : "Legacy plan"
+        : user?.planExpiresAt
+          ? `Until ${formatDate(user.planExpiresAt, { month: "short", day: "numeric" })}`
+          : "Upgrade anytime";
 
   const copyText = async (text, onSuccess) => {
     try {
@@ -685,7 +773,7 @@ function Dashboard() {
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
               <StatCard label="Active links" value={formatNumber(urls.length)} hint={limit === Infinity ? "Unlimited plan" : `${Math.max(0, limit - urls.length)} spots left`} icon={<Link2 className="h-4 w-4" />} />
               <StatCard label="Total clicks" value={formatNumber(totalClicks)} hint="Across all links" icon={<MousePointerClick className="h-4 w-4" />} accent="emerald" />
-              <StatCard label="Current plan" value={user.category === "basic" && !user.planExpiresAt ? "Free" : capitalize(user.category)} hint={user.planExpiresAt ? `Until ${formatDate(user.planExpiresAt, { month: "short", day: "numeric" })}` : "Upgrade anytime"} icon={<Wallet className="h-4 w-4" />} accent="amber" />
+              <StatCard label="Current plan" value={planValue} hint={planHint} icon={<Wallet className="h-4 w-4" />} accent="amber" />
               <StatCard label="Clicks / link" value={urls.length ? (totalClicks / urls.length).toFixed(1) : "0"} hint="Average performance" icon={<TrendingUp className="h-4 w-4" />} accent="sky" />
             </div>
 
