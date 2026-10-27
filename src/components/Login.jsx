@@ -1,158 +1,72 @@
+import { SignIn, useAuth } from '@clerk/react';
+import { Link, Navigate, useLocation } from 'react-router-dom';
+import { ArrowRight, KeyRound, ShieldCheck, Sparkles } from 'lucide-react';
+import { AuthShell } from './ui/auth-shell';
+import { Badge } from './ui/badge';
+import { clerkAppearance } from '../utils/clerkAppearance';
+import {
+    clearAuthRedirect,
+    readAuthRedirect,
+    rememberAuthRedirect,
+} from '../utils/authRedirect';
 
-import  { useState } from 'react';
-
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate for routing
-import { toast } from 'react-toastify';
-
+// Clerk's prebuilt <SignIn> handles password/email-code sign-in and MFA. The
+// route is mounted at /login/* so Clerk can use path routing for its internal
+// steps. Password reset is linked separately to the email-code reset page.
 function Login() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
-    const [loading, setLoading] = useState(false); // State to manage loading status
-    const navigate = useNavigate(); // Hook for navigation
-   
+    const { isLoaded, isSignedIn } = useAuth();
+    const location = useLocation();
+    const from = location.state?.from;
+    const remembered = from ? rememberAuthRedirect(from) : null;
+    const redirectTo = remembered || readAuthRedirect();
 
-
-    const handleSubmit = async (event) => {
-        event.preventDefault(); // Prevent page refresh
-
-        // Basic validation
-        if (!email || !password) {
-            setErrorMessage('All fields are required');
-            toast.error('All fields are required');
-            return;
-        }
-
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        // myHeaders.append("Access-Control-Allow-Origin", "*");
-        // myHeaders.append("Authorization", token);
-
-        const raw = JSON.stringify({ email, password });
-
-        const requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: raw,
-            redirect: 'follow'
-        };
-
-        try {
-            setLoading(true); // Set loading to true when starting the request
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/user/login`, requestOptions);
-            const result = await response.json(); // Parse response as JSON
-
-            if (response.ok) {
-                // Successful login
-                toast.success('Login successful! Redirecting...');
-                setSuccessMessage('Login successful! Redirecting...');
-                setErrorMessage(null);
-
-                // Store the token in local storage
-                localStorage.setItem("token", result.token);
-                document.cookie = `token=${result.token}; path=/;`;
-
-                // Redirect to the dashboard or home page after 2 seconds
-                setTimeout(() => {
-                    setLoading(false); // Set loading to false after the request is complete
-                    navigate('/'); // Change this to your desired route
-                }, 2000);
-            } else {
-                // Handle error response from backend
-                setErrorMessage(result.message || 'Login failed. Please try again.');
-                setSuccessMessage(null);
-                setLoading(false);
-                toast.error(result.message);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            setLoading(false);
-            setErrorMessage('There was an issue with login.'); // Show error message
-            setSuccessMessage(null);
-        }
-    };
+    if (isLoaded && isSignedIn) {
+        clearAuthRedirect();
+        return <Navigate to={redirectTo} replace />;
+    }
 
     return (
-        <>
-            <section className="bg-gray-50 dark:bg-gray-900">
-                <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                    <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-                        <img className=" h-14 mr-2" src="/logo.png" alt="logo" />
-                        
-                    </a>
-                    <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-                        <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-                            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                                Sign in to your account
-                            </h1>
+        <AuthShell>
+            <div className="mb-7">
+                <Badge variant="brand" className="mb-4 gap-1.5">
+                    <Sparkles className="h-3 w-3" /> Welcome back
+                </Badge>
+                <h1 className="font-display text-3xl font-semibold leading-[1.05] tracking-[-0.05em] text-ink">
+                    Sign in to your studio.
+                </h1>
+                <p className="mt-2 text-[13px] leading-6 text-muted">
+                    Pick up where you left off. Your links, QR codes and page are waiting.
+                </p>
+            </div>
 
-                            {/* Display error or success message */}
-                            {errorMessage && (
-                                <div className="text-red-500">
-                                    {errorMessage}
-                                </div>
-                            )}
-                            {successMessage && (
-                                <div className="text-green-500">
-                                    {successMessage}
-                                </div>
-                            )}
+            <div className="auth-clerk min-w-0">
+                <SignIn
+                    routing="path"
+                    path="/login"
+                    signUpUrl="/register"
+                    fallbackRedirectUrl={redirectTo}
+                    appearance={clerkAppearance}
+                />
+            </div>
 
-                            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
-                                <div>
-                                    <div>
-                                    <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                                    <input 
-                                        type="email" 
-                                        name="email" 
-                                        id="email" 
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                                        placeholder="name@company.com" 
-                                        required
-                                        value={email}
-                                        onChange={(e) => {setEmail(e.target.value); setLoading(false);}}
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                                    <input 
-                                        type="password" 
-                                        name="password" 
-                                        id="password" 
-                                        placeholder="••••••••" 
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                                        required
-                                        value={password}
-                                        onChange={(e) => {setLoading(false); setPassword(e.target.value)}}
-                                    />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-start">
-                                        <div className="flex items-center h-5">
-                                            <input id="remember" aria-describedby="remember" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" />
-                                        </div>
-                                        <div className="ml-3 text-sm">
-                                            <label htmlFor="remember" className="text-gray-500 dark:text-gray-300">Remember me</label>
-                                        </div>
-                                    </div>
-                                    <a href="#" className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">Forgot password?</a>
-                                </div>
-                                <button type="submit" className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">{loading ? 'Loading...' : 'Sign in'}</button>
-                                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                                    Don’t have an account yet? <Link to="/register" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Register</Link>
-                                </p>
-                                </div>
-                                
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </>
+            <div className="mt-5 flex items-center justify-between gap-4 border-t border-ink/10 pt-4">
+                <span className="inline-flex items-center gap-1.5 text-[11px] text-muted">
+                    <KeyRound className="h-3.5 w-3.5 text-ink/35" /> Forgot your password?
+                </span>
+                <Link
+                    to="/forgot-password"
+                    className="inline-flex items-center gap-1 text-[12px] font-semibold text-brand-700 transition hover:text-brand-800"
+                >
+                    Reset it <ArrowRight className="h-3 w-3" />
+                </Link>
+            </div>
+
+            <p className="mt-5 flex items-center gap-1.5 text-[10px] text-ink/35">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+                Secure authentication powered by Clerk.
+            </p>
+        </AuthShell>
     );
 }
-
-
 
 export default Login;

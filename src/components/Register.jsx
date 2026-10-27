@@ -1,170 +1,68 @@
-import  { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';  // Import useNavigate for routing
-import { toast } from 'react-toastify';
+import { SignUp, useAuth } from '@clerk/react';
+import { Navigate } from 'react-router-dom';
+import { Check, ShieldCheck, Sparkles, UserRound } from 'lucide-react';
+import { AuthShell } from './ui/auth-shell';
+import { Badge } from './ui/badge';
+import { clerkAppearance } from '../utils/clerkAppearance';
+import { clearAuthRedirect, readAuthRedirect } from '../utils/authRedirect';
 
+// Clerk's prebuilt <SignUp> handles email verification and any password
+// completion steps. No app-specific username is collected; the backend
+// generates a unique MongoDB username from the verified email address.
 function Register() {
-  // State for form inputs
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);  // State for success message
-  const [loading, setLoading] = useState(false);  // State to manage loading status
-  const navigate = useNavigate();  // Hook for navigation
+    const { isLoaded, isSignedIn } = useAuth();
+    const redirectTo = readAuthRedirect();
 
-  // Handle form submission
-  const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent page refresh
-
-    // Basic validation to check if fields are filled
-    if (!username || !email || !password) {
-      setErrorMessage('All fields are required');
-      return;
+    if (isLoaded && isSignedIn) {
+        clearAuthRedirect();
+        return <Navigate to={redirectTo} replace />;
     }
 
-    // Setup for fetch request
-    const myHeaders = new Headers();
-    myHeaders.append('Content-Type', 'application/json');
-
-    const raw = JSON.stringify({
-      username: username,
-      email: email,
-      password: password,
-    });
-
-    const requestOptions = {
-      method: 'POST',
-      headers: myHeaders,
-      body: raw,
-      redirect: 'follow',
-    };
-
-    try {
-      setLoading(true);  // Set loading to true when starting the request
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/user/register`, requestOptions);
-      const result = await response.json();  // Parse response as JSON
-
-      if (response.ok) {
-        // Success - show success message and redirect
-        setSuccessMessage('Registration successful! Redirecting to login...');
-        toast.success('Registration successful! Redirecting to login...');
-        setErrorMessage(null);
-
-        // Redirect to login page after 2 seconds
-        setTimeout(() => {
-          setLoading(false);  // Set loading to false after the request is complete
-          navigate('/login');  // Redirect to login route
-        }, 2000);
-      } else {
-        // Handle error response from backend
-        toast(result.error );
-        setErrorMessage(result.error || 'Registration failed. Please try again.');
-        
-        setSuccessMessage(null);
-        
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      toast(error);
-      setErrorMessage('There was an issue with registration.');  // Show error message
-      setSuccessMessage(null);
-    }
-  };
-
-  return (
-    <>
-      <section className="bg-gray-50 dark:bg-gray-900">
-        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-          <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-            <img className=" h-14 mr-2" src="/logo.png" alt="logo"/>
-            {/* Flowbite */}
-          </a>
-          <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-              <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                Create an account
-              </h1>
-
-              {/* Display error or success message */}
-              {errorMessage && (
-                <div className="text-red-500">
-                  {errorMessage}
-                </div>
-              )}
-              {successMessage && (
-                <div className="text-green-500">
-                  {successMessage}
-                </div>
-              )}
-
-              <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
-                {/* Username Input */}
-                <div>
-                  <label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your Username</label>
-                  <input 
-                    type="text" 
-                    name="username" 
-                    id="username" 
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                    placeholder="Your username" 
-                    required
-                    value={username}
-                    onChange={(e) => {setUsername(e.target.value); setLoading(false);}}
-                  />
-                </div>
-
-                {/* Email Input */}
-                <div>
-                  <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                  <input 
-                    type="email" 
-                    name="email" 
-                    id="email" 
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                    placeholder="name@company.com" 
-                    required
-                    value={email}
-                    onChange={(e) => {setEmail(e.target.value); setLoading(false);}}
-                  />
-                </div>
-
-                {/* Password Input */}
-                <div>
-                  <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                  <input 
-                    type="password" 
-                    name="password" 
-                    id="password" 
-                    placeholder="••••••••" 
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                    required
-                    value={password}
-                    onChange={(e) => {setLoading(false); setPassword(e.target.value);}}
-                  />
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input id="terms" aria-describedby="terms" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="terms" className="font-light text-gray-500 dark:text-gray-300">I accept the <a className="font-medium text-primary-600 hover:underline dark:text-primary-500" href="#">Terms and Conditions</a></label>
-                  </div>
-                </div>
-
-                <button type="submit" className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                  {loading ? 'Loading...' : 'Register'}
-                </button>
-                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                  Already have an account? <Link to="/login" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Login here</Link>
+    return (
+        <AuthShell>
+            <div className="mb-7">
+                <Badge variant="brand" className="mb-4 gap-1.5">
+                    <Sparkles className="h-3 w-3" /> Start free
+                </Badge>
+                <h1 className="font-display text-3xl font-semibold leading-[1.05] tracking-[-0.05em] text-ink">
+                    Create your studio.
+                </h1>
+                <p className="mt-2 text-[13px] leading-6 text-muted">
+                    One account for your short links, QR codes and public page.
+                    No credit card needed.
                 </p>
-              </form>
             </div>
-          </div>
-        </div>
-      </section>
-    </>
-  );
+
+            <div className="auth-clerk min-w-0">
+                <SignUp
+                    routing="path"
+                    path="/register"
+                    signInUrl="/login"
+                    fallbackRedirectUrl={redirectTo}
+                    appearance={clerkAppearance}
+                />
+            </div>
+
+            <div className="mt-5 rounded-xl border border-ink/10 bg-canvas p-3">
+                <p className="flex items-center gap-1.5 text-[11px] font-semibold text-ink/70">
+                    <UserRound className="h-3.5 w-3.5 text-brand-500" /> Your public username is generated automatically.
+                </p>
+                <p className="mt-1 pl-5 text-[10px] leading-5 text-muted">
+                    We use the first part of your verified email. You can edit your
+                    page details later.
+                </p>
+            </div>
+
+            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] text-ink/35">
+                <span className="inline-flex items-center gap-1.5">
+                    <Check className="h-3.5 w-3.5 text-emerald-500" /> Free to start
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> Secure by Clerk
+                </span>
+            </div>
+        </AuthShell>
+    );
 }
 
 export default Register;

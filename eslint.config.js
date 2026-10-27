@@ -29,6 +29,10 @@ export default [
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       'react/jsx-no-target-blank': 'off',
+      // This is a JavaScript app with no runtime PropTypes dependency; prop
+      // contracts are documented in component signatures and validated by the
+      // backend. TypeScript migration would replace this rule entirely.
+      'react/prop-types': 'off',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },

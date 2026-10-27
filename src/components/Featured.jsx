@@ -1,85 +1,201 @@
-import React from 'react'
-import iconlike from '../assets/iconlike.png'
+import {
+  ArrowUpRight,
+  BarChart3,
+  Link2,
+  MousePointerClick,
+  QrCode,
+  Sparkles,
+  UserRound,
+} from "lucide-react";
+import { QRCodeCanvas } from "qrcode.react";
+import { BRAND, brandShortLink, brandUrl } from "../lib/brand";
+import { BentoGrid, BentoGridItem } from "./ui/bento-grid";
+import { SectionHeading } from "./ui/section-heading";
+import { Badge } from "./ui/badge";
 
-function Featured() {
-    return (
-        <>
-            {/* https://www.shorturl.at/ get data from here */}
-            <section className="bg-white dark:bg-gray-900 ">
-                <div className="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
-                    <div className="max-w-screen-md mb-8 lg:mb-16">
-                        <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Designed for business teams like yours</h2>
-                        <p className="text-gray-500 sm:text-xl dark:text-gray-400">Here at Flowbite we focus on markets where technology, innovation, and capital can unlock long-term value and drive economic growth.</p>
-                    </div>
-                    <div className="space-y-8 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-12 md:space-y-0">
-                        <div>
-                            <div className="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
-                                <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd" d="M15.03 9.684h3.965c.322 0 .64.08.925.232.286.153.532.374.717.645a2.109 2.109 0 0 1 .242 1.883l-2.36 7.201c-.288.814-.48 1.355-1.884 1.355-2.072 0-4.276-.677-6.157-1.256-.472-.145-.924-.284-1.348-.404h-.115V9.478a25.485 25.485 0 0 0 4.238-5.514 1.8 1.8 0 0 1 .901-.83 1.74 1.74 0 0 1 1.21-.048c.396.13.736.397.96.757.225.36.32.788.269 1.211l-1.562 4.63ZM4.177 10H7v8a2 2 0 1 1-4 0v-6.823C3 10.527 3.527 10 4.176 10Z" clip-rule="evenodd" />
-                                </svg>
+const LOGO_URL =
+  "https://res.cloudinary.com/sggs/image/upload/v1731136210/user_profile_photos/logo_yqftnr.png";
 
+function LinkListVisual() {
+  const links = [
+    { label: brandShortLink("launch"), clicks: "2.4k", growth: "+18%" },
+    { label: brandShortLink("portfolio"), clicks: "1.1k", growth: "+9%" },
+    { label: brandShortLink("menu"), clicks: "846", growth: "+24%" },
+  ];
 
-
-                            </div>
-                            <h3 className="mb-2 text-xl font-bold dark:text-white">Easy</h3>
-                            <p className="text-gray-500 dark:text-gray-400">ShortURL is easy and fast, enter the long link to get your shortened link</p>
-                        </div>
-                        <div>
-                            <div className="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
-                                <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.213 9.787a3.391 3.391 0 0 0-4.795 0l-3.425 3.426a3.39 3.39 0 0 0 4.795 4.794l.321-.304m-.321-4.49a3.39 3.39 0 0 0 4.795 0l3.424-3.426a3.39 3.39 0 0 0-4.794-4.795l-1.028.961" />
-                                </svg>
-
-                            </div>
-                            <h3 className="mb-2 text-xl font-bold dark:text-white">Shortened</h3>
-                            <p className="text-gray-500 dark:text-gray-400">Use any link, no matter what size, ShortURL always shortens</p>
-                        </div>
-                        <div>
-                            <div className="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
-                                <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd" d="M11.644 3.066a1 1 0 0 1 .712 0l7 2.666A1 1 0 0 1 20 6.68a17.694 17.694 0 0 1-2.023 7.98 17.406 17.406 0 0 1-5.402 6.158 1 1 0 0 1-1.15 0 17.405 17.405 0 0 1-5.403-6.157A17.695 17.695 0 0 1 4 6.68a1 1 0 0 1 .644-.949l7-2.666Zm4.014 7.187a1 1 0 0 0-1.316-1.506l-3.296 2.884-.839-.838a1 1 0 0 0-1.414 1.414l1.5 1.5a1 1 0 0 0 1.366.046l4-3.5Z" clip-rule="evenodd" />
-                                </svg>
-
-                            </div>
-                            <h3 className="mb-2 text-xl font-bold dark:text-white">Secure</h3>
-                            <p className="text-gray-500 dark:text-gray-400">It is fast and secure, our service has HTTPS protocol and data encryption</p>
-                        </div>
-                        <div>
-                            <div className="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
-                                <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 3v4a1 1 0 0 1-1 1H5m8 7.5 2.5 2.5M19 4v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7.914a1 1 0 0 1 .293-.707l3.914-3.914A1 1 0 0 1 9.914 3H18a1 1 0 0 1 1 1Zm-5 9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z" />
-                                </svg>
-
-                            </div>
-                            <h3 className="mb-2 text-xl font-bold dark:text-white">Statistics</h3>
-                            <p className="text-gray-500 dark:text-gray-400">Check the number of clicks that your shortened URL received</p>
-                        </div>
-                        <div>
-                            <div className="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
-                                <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd" d="M12 14a3 3 0 0 1 3-3h4a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-4a3 3 0 0 1-3-3Zm3-1a1 1 0 1 0 0 2h4v-2h-4Z" clip-rule="evenodd" />
-                                    <path fill-rule="evenodd" d="M12.293 3.293a1 1 0 0 1 1.414 0L16.414 6h-2.828l-1.293-1.293a1 1 0 0 1 0-1.414ZM12.414 6 9.707 3.293a1 1 0 0 0-1.414 0L5.586 6h6.828ZM4.586 7l-.056.055A2 2 0 0 0 3 9v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2h-4a5 5 0 0 1 0-10h4a2 2 0 0 0-1.53-1.945L17.414 7H4.586Z" clip-rule="evenodd" />
-                                </svg>
-
-                            </div>
-                            <h3 className="mb-2 text-xl font-bold dark:text-white">Reliable</h3>
-                            <p className="text-gray-500 dark:text-gray-400">All links that try to disseminate spam, viruses and malware are deleted</p>
-                        </div>
-                        <div>
-                            <div className="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
-                                <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd" d="M5 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4Zm12 12V5H7v11h10Zm-5 1a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H12Z" clip-rule="evenodd" />
-                                </svg>
-
-                            </div>
-                            <h3 className="mb-2 text-xl font-bold dark:text-white">Devices</h3>
-                            <p className="text-gray-500 dark:text-gray-400">Compatible with smartphones, tablets and desktop</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </>
-    )
+  return (
+    <div className="relative mt-2 overflow-hidden rounded-2xl border border-ink/10 bg-canvas p-3">
+      <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-[9px] font-semibold text-emerald-700">
+        <span className="h-1 w-1 rounded-full bg-emerald-500" /> Live
+      </div>
+      <div className="space-y-2">
+        {links.map((link) => (
+          <div
+            key={link.label}
+            className="flex items-center gap-2.5 rounded-xl border border-ink/[0.07] bg-white px-3 py-2.5"
+          >
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+              <Link2 className="h-3.5 w-3.5" />
+            </span>
+            <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-ink">{link.label}</span>
+            <span className="text-[10px] text-muted">{link.clicks}</span>
+            <span className="text-[9px] font-semibold text-emerald-600">{link.growth}</span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-2 flex items-center justify-between rounded-xl bg-ink px-3 py-2.5 text-white">
+        <span className="text-[10px] text-white/50">Total clicks this week</span>
+        <span className="font-display text-sm font-semibold">+34.8%</span>
+      </div>
+    </div>
+  );
 }
 
-export default Featured
+function AnalyticsVisual() {
+  return (
+    <div className="mt-4 rounded-2xl border border-ink/10 bg-canvas p-3">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-[9px] font-medium uppercase tracking-[0.14em] text-muted">Clicks</p>
+          <p className="font-display text-xl font-semibold tracking-[-0.04em] text-ink">12,840</p>
+        </div>
+        <Badge variant="success" className="gap-1 text-[9px]">
+          <ArrowUpRight className="h-3 w-3" /> 18.2%
+        </Badge>
+      </div>
+      <div className="mt-3 flex h-16 items-end gap-1.5">
+        {[32, 46, 40, 58, 48, 72, 62, 86, 74, 94, 82, 100].map((height, index) => (
+          <div
+            key={index}
+            className="flex-1 rounded-t-sm bg-gradient-to-t from-brand-500/20 to-brand-500/70"
+            style={{ height: `${height}%` }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function QrVisual() {
+  return (
+    <div className="mt-4 flex items-center gap-4 rounded-2xl border border-ink/10 bg-canvas p-3">
+      <div className="rounded-xl border border-ink/10 bg-white p-2">
+        <QRCodeCanvas
+          value={brandUrl("qr")}
+          size={72}
+          bgColor="#ffffff"
+          fgColor="#0b0b10"
+          level="H"
+          imageSettings={{ src: LOGO_URL, height: 14, width: 14, excavate: true }}
+          includeMargin={false}
+        />
+      </div>
+      <div>
+        <p className="text-[11px] font-semibold text-ink">Scannable everywhere</p>
+        <p className="mt-1 text-[10px] leading-4 text-muted">Colour, logo, shape. Make it yours.</p>
+        <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-brand-600">
+          Open QR studio <ArrowUpRight className="h-3 w-3" />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function ProfileVisual() {
+  return (
+    <div className="mt-4 rounded-2xl border border-ink/10 bg-[#111118] p-3">
+      <div className="flex flex-col items-center rounded-xl bg-white/[0.04] px-4 py-5">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-brand-400/60 bg-gradient-to-br from-brand-500 to-sky-400 text-sm font-bold text-white">
+          SB
+        </div>
+        <p className="mt-2 text-[11px] font-semibold text-white">Sai Bende</p>
+        <p className="mt-1 text-center text-[9px] leading-4 text-white/40">Designer, builder, link collector.</p>
+        <div className="mt-3 grid w-full gap-1.5">
+          {["Portfolio", "Latest work", "Say hello"].map((label) => (
+            <span key={label} className="rounded-lg border border-white/10 bg-white/[0.06] py-1.5 text-center text-[9px] font-medium text-white/65">
+              {label}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Featured() {
+  return (
+    <section className="section-space">
+      <div className="container-page">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <SectionHeading
+            eyebrow="Inside the workspace"
+            title={
+              <>
+                Everything you need to make a link{" "}
+                <span className="text-gradient">feel intentional.</span>
+              </>
+            }
+            description="A calmer way to build, share and understand your corner of the internet. No spreadsheets, no duct tape."
+          />
+          <Badge variant="outline" className="w-fit gap-2 px-3.5 py-2 text-[11px]">
+            <Sparkles className="h-3.5 w-3.5 text-brand-500" />
+            Designed for focus
+          </Badge>
+        </div>
+
+        <BentoGrid className="mt-10">
+          <BentoGridItem
+            className="md:col-span-4"
+            icon={<Link2 className="h-5 w-5" />}
+            title="Your links, finally in one place"
+            description="Create branded short links, see how they perform, and keep every destination organised without another spreadsheet."
+            header={<LinkListVisual />}
+          />
+          <BentoGridItem
+            className="md:col-span-2"
+            icon={<BarChart3 className="h-5 w-5" />}
+            title="Clicks with context"
+            description="Open a link and see its visit history. Know what is landing, and what needs another look."
+            header={<AnalyticsVisual />}
+          />
+          <BentoGridItem
+            className="md:col-span-2"
+            icon={<QrCode className="h-5 w-5" />}
+            title="QR codes that fit your brand"
+            description="Colours, shapes and a logo. Download a code that looks like it belongs to you."
+            header={<QrVisual />}
+          />
+          <BentoGridItem
+            className="md:col-span-2"
+            icon={<UserRound className="h-5 w-5" />}
+            title="A link-in-bio worth visiting"
+            description="One profile page for every place you exist. Add your photo, a short bio, and your best links."
+            header={<ProfileVisual />}
+          />
+          <BentoGridItem
+            className="md:col-span-2"
+            icon={<MousePointerClick className="h-5 w-5" />}
+            title="Short paths, clear intent"
+            description="Custom back-halves turn long, forgettable URLs into something people can remember and share."
+            header={
+              <div className="mt-4 rounded-2xl border border-ink/10 bg-canvas p-3">
+                <div className="flex min-w-0 items-center gap-2 rounded-xl border border-ink/10 bg-white px-3 py-2.5">
+                  <span className="shrink-0 text-[9px] text-ink/30">{BRAND.domain}/</span>
+                  <span className="truncate text-[11px] font-semibold text-ink">the-good-stuff</span>
+                  <span className="ml-auto flex h-6 w-6 items-center justify-center rounded-md bg-brand-50 text-brand-600">
+                    <ArrowUpRight className="h-3 w-3" />
+                  </span>
+                </div>
+                <div className="mt-2 flex items-center gap-1.5 text-[9px] text-muted">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Available
+                </div>
+              </div>
+            }
+          />
+        </BentoGrid>
+      </div>
+    </section>
+  );
+}
+
+export default Featured;

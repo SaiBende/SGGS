@@ -1,223 +1,320 @@
-import { useState } from 'react';
-import { QRCodeCanvas } from 'qrcode.react';
-import { toast } from 'react-toastify';
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { QRCodeCanvas } from "qrcode.react";
+import { toast } from "react-toastify";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  ArrowRight,
+  Check,
+  Copy,
+  Download,
+  ExternalLink,
+  Link2,
+  Loader2,
+  LockKeyhole,
+  MousePointerClick,
+  QrCode,
+  Sparkles,
+  Wand2,
+} from "lucide-react";
+import { apiFetch } from "../utils/auth";
+import { cn } from "../lib/utils";
+import { shortDomain, shortUrl } from "../lib/brand";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import { FieldHint, Input, Label } from "./ui/input";
 
-function ShortenLink() {
-    const [longURL, setLongURL] = useState('');
-    const [customURL, setCustomURL] = useState('');
-    const [loading, setLoading] = useState(false); // State to handle loading
-    const [shortenedURL, setShortenedURL] = useState(''); // State to store the shortened URL
-    const [error, setError] = useState(null); // State to handle errors
-    const [copySuccess, setCopySuccess] = useState(''); // State to handle copy success message
+const LOGO_URL =
+  "https://res.cloudinary.com/sggs/image/upload/v1731136210/user_profile_photos/logo_yqftnr.png";
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setLoading(true); // Set loading to true when request starts
-        setError(null);
-        setShortenedURL('');
-        setCopySuccess('');
+function ShortenLink({ compact = false, returnTo = "/shortenlink" }) {
+  const [longURL, setLongURL] = useState("");
+  const [customURL, setCustomURL] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [shortenedURL, setShortenedURL] = useState("");
+  const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [pasting, setPasting] = useState(false);
+  const qrRef = useRef(null);
+  const navigate = useNavigate();
 
-        const token = localStorage.getItem('token');
-        console.log(token);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
+    setShortenedURL("");
+    setCopied(false);
 
-        if (token) {
-            // Set the token as a cookie
-            document.cookie = `token=${token}; path=/`;
+    try {
+      const response = await apiFetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: longURL,
+          customURL: customURL.trim(),
+        }),
+      });
 
-            const myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-            myHeaders.append("Authorization", token);
-
-            const raw = JSON.stringify({
-                url: longURL,
-                customURL: customURL
-            });
-
-            const requestOptions = {
-                method: 'POST',
-                headers: myHeaders,
-                body: raw,
-                credentials: 'include', // Include cookies in the request
-                redirect: 'follow'
-            };
-
-            // Make the request to the server
-            fetch(`${import.meta.env.VITE_API_URL}/`, requestOptions)
-                .then(response => response.json()) // Convert response to JSON
-                .then(result => {
-                    setLoading(false); // Stop loading
-                    if (result.id) {
-                        const newURL = `${import.meta.env.VITE_FRONTEND_URL}/${result.id}`;
-                        toast.success('URL shortened successfully!');
-                        setShortenedURL(newURL); // Store the shortened URL
-                    } else {
-                        toast.error(result.error);
-                        setError("Failed to generate URL");
-                    }
-                })
-                .catch(error => {
-                    setLoading(false);
-                    setError('Error: ' + error.message); // Set error if fetch fails
-                });
-        } else {
-            // Redirect to login if token is not found
-            window.location.href = "/register";
-        }
-    };
-
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(shortenedURL).then(() => {
-            toast.success('URL copied to clipboard!');
-            setCopySuccess('URL copied!');
-        }).catch(() => {
-            setCopySuccess('Failed to copy');
+      if (response.status === 401) {
+        navigate("/login", {
+          state: { from: { pathname: returnTo, search: "", hash: "" } },
         });
-    };
+        return;
+      }
 
-    // Function to download the QR code as an image
-    const downloadQRCode = () => {
-        const canvas = document.getElementById("qrcode");
-        const pngUrl = canvas
-            .toDataURL("image/png")
-            .replace("image/png", "image/octet-stream");
-        let downloadLink = document.createElement("a");
-        downloadLink.href = pngUrl;
-        downloadLink.download = "qrcode.png";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-    };
+      const result = await response.json();
 
-    return (
-        <>
-            <section className=' flex flex-col items-center  bg-gray-50 dark:bg-gray-900 '>
-                <h2 className="text-3xl text-center font-bold leading-tight tracking-tight text-gray-900 md:text-2xl xl:text-3xl dark:text-white p-2">
-                    Shorten Your Loooooooooong URL
-                </h2>
+      if (result.id) {
+        const newURL = shortUrl(result.id);
+        toast.success("Short link created");
+        setShortenedURL(newURL);
+      } else {
+        toast.error(result.error || "Could not create that link");
+        setError(result.error || "Failed to generate URL. Please try again.");
+      }
+    } catch (fetchError) {
+      setError(
+        fetchError.message === "Failed to fetch"
+          ? "Could not reach the server. Check your connection and try again."
+          : `Something went wrong: ${fetchError.message}`
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                <form className="bg-white shadow-md rounded-lg p-6 w-full max-w-md dark:bg-gray-800 dark:text-gray-100" onSubmit={handleSubmit}>
-                    <div className="mb-5">
-                        <label htmlFor="longurl" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Enter Long URL</label>
-                        <input
-                            type="text"
-                            id="longurl"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Enter your long URL"
-                            value={longURL}
-                            onChange={(e) => setLongURL(e.target.value)}
-                            required
-                        />
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(shortenedURL);
+      setCopied(true);
+      toast.success("Copied to clipboard");
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Could not copy. Select the link and copy it manually.");
+    }
+  };
+
+  const pasteFromClipboard = async () => {
+    try {
+      setPasting(true);
+      const text = await navigator.clipboard.readText();
+      if (text) setLongURL(text.trim());
+    } catch {
+      toast.error("Clipboard access was blocked. Paste with Ctrl/Cmd + V.");
+    } finally {
+      setPasting(false);
+    }
+  };
+
+  const downloadQRCode = () => {
+    const canvas = qrRef.current?.querySelector("canvas") || document.getElementById("shorten-qr");
+    if (!canvas) return;
+    const downloadLink = document.createElement("a");
+    downloadLink.href = canvas.toDataURL("image/png");
+    downloadLink.download = "sggs-qr.png";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  };
+
+  const resetForm = () => {
+    setLongURL("");
+    setCustomURL("");
+    setShortenedURL("");
+    setError(null);
+    setCopied(false);
+  };
+
+  return (
+    <div
+      className={cn(
+        "relative w-full overflow-hidden rounded-[1.75rem] border border-ink/10 bg-white shadow-card",
+        compact ? "max-w-xl" : "max-w-3xl"
+      )}
+    >
+      <div className="flex items-center justify-between gap-3 border-b border-ink/10 px-5 py-4 sm:px-6">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+            <Link2 className="h-4 w-4" />
+          </span>
+          <div>
+            <p className="font-display text-[15px] font-semibold tracking-[-0.02em] text-ink">Create a short link</p>
+            <p className="text-[11px] text-muted">Paste, customise, share.</p>
+          </div>
+        </div>
+        <Badge variant="brand" className="hidden sm:inline-flex">
+          <Sparkles className="h-3 w-3" /> Free
+        </Badge>
+      </div>
+
+      <div className="p-5 sm:p-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="longurl" required>
+                Destination URL
+              </Label>
+              <button
+                type="button"
+                onClick={pasteFromClipboard}
+                disabled={pasting}
+                className="mb-2 inline-flex items-center gap-1.5 text-[11px] font-semibold text-brand-600 transition hover:text-brand-700 disabled:opacity-50"
+              >
+                <Copy className="h-3 w-3" /> {pasting ? "Pasting..." : "Paste"}
+              </button>
+            </div>
+            <div className="relative">
+              <Link2 className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/30" />
+              <Input
+                id="longurl"
+                type="url"
+                inputMode="url"
+                autoComplete="url"
+                className="pl-10"
+                placeholder="https://your-long-url.com/a-very-long-path"
+                value={longURL}
+                onChange={(event) => setLongURL(event.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="customtext">Custom back-half</Label>
+            <div className="flex overflow-hidden rounded-xl border border-ink/15 bg-white shadow-sm transition focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/10">
+              <span className="flex shrink-0 items-center border-r border-ink/10 bg-ink/[0.035] px-3 text-[11px] font-medium text-ink/45 sm:px-3.5 sm:text-[13px]">
+                {shortDomain()}/
+              </span>
+              <input
+                id="customtext"
+                type="text"
+                className="h-12 min-w-0 flex-1 bg-transparent px-3.5 text-sm text-ink outline-none placeholder:text-ink/30"
+                placeholder="summer-sale"
+                value={customURL}
+                onChange={(event) => setCustomURL(event.target.value.replace(/\s+/g, "-"))}
+                maxLength={32}
+              />
+            </div>
+            <FieldHint>Optional. Letters, numbers and hyphens work best.</FieldHint>
+          </div>
+
+          {error && (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700" role="alert">
+              {error}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
+            <p className="flex items-center gap-1.5 text-[11px] text-muted">
+              <LockKeyhole className="h-3.5 w-3.5 text-emerald-500" />
+              Your links stay private until you share them.
+            </p>
+            <Button type="submit" variant="primary" size="lg" disabled={loading} className="w-full sm:w-auto">
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+              {loading ? "Creating..." : "Shorten link"}
+              {!loading && <ArrowRight className="h-4 w-4" />}
+            </Button>
+          </div>
+        </form>
+
+        <AnimatePresence initial={false}>
+          {shortenedURL && (
+            <motion.div
+              initial={{ opacity: 0, y: 16, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: "auto" }}
+              exit={{ opacity: 0, y: 10, height: 0 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 sm:p-5">
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+                  <div className="min-w-0 flex-1">
+                    <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                      <Check className="h-3.5 w-3.5" /> Link ready
+                    </p>
+                    <a
+                      href={shortenedURL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 block truncate font-display text-xl font-semibold tracking-[-0.03em] text-ink hover:text-brand-600"
+                    >
+                      {shortenedURL.replace(/^https?:\/\//, "")}
+                    </a>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Button size="sm" variant="primary" onClick={copyToClipboard}>
+                        {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                        {copied ? "Copied" : "Copy link"}
+                      </Button>
+                      <a
+                        href={shortenedURL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-ink/15 bg-white px-3.5 text-[13px] font-semibold text-ink transition hover:border-ink/25"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" /> Open
+                      </a>
+                      <button
+                        type="button"
+                        onClick={resetForm}
+                        className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[13px] font-semibold text-ink/55 transition hover:bg-white hover:text-ink"
+                      >
+                        Create another
+                      </button>
                     </div>
-                    <div className="mb-5">
-                        <label htmlFor="custom" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Enter the Custom text for your URL</label>
-                        <input
-                            type="text"
-                            id="customtext"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="customurl.com/yourtext"
-                            value={customURL}
-                            onChange={(e) => setCustomURL(e.target.value)}
-                        />
-                    </div>
-                    <div className="flex">
-                        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 justify-center">
-                            Generate the Shorten URL
-                        </button>
-                    </div>
-                </form>
+                  </div>
 
-                {/* Loading Spinner */}
-                {loading && (
-                    <div className="mt-5 flex justify-center items-center">
-                        <svg
-                            className="animate-spin h-5 w-5 text-blue-600"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                            ></circle>
-                            <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8v8H4z"
-                            ></path>
-                        </svg>
+                  <div className="flex shrink-0 items-center gap-3 rounded-xl border border-ink/10 bg-white p-2.5">
+                    <div ref={qrRef} className="rounded-lg bg-white p-1">
+                      <QRCodeCanvas
+                        id="shorten-qr"
+                        value={shortenedURL}
+                        size={78}
+                        bgColor="#ffffff"
+                        fgColor="#0b0b10"
+                        level="H"
+                        imageSettings={{
+                          src: LOGO_URL,
+                          height: 16,
+                          width: 16,
+                          excavate: true,
+                        }}
+                        includeMargin={false}
+                      />
                     </div>
-                )}
-
-                {/* Error Message */}
-                {error && (
-                    <p className="mt-5 text-red-600 font-medium text-center">{error}</p>
-                )}
-
-                {/* Shortened URL Display with Copy Button */}
-                {shortenedURL && (
-                    <div className="mt-5 text-center">
-                        <p className="text-lg text-gray-900 dark:text-white">Your shortened URL:</p>
-                        <div className="flex justify-center items-center">
-                            <a
-                                href={shortenedURL}
-                                className="text-blue-600 dark:text-blue-400 mr-3"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                {shortenedURL}
-                            </a>
-                            <button
-                                onClick={copyToClipboard}
-                                className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
-                            >
-                                Copy
-                            </button>
-                        </div>
-                        {copySuccess && (
-                            <p className="text-green-600 dark:text-green-400 mt-2">{copySuccess}</p>
-                        )}
+                    <div>
+                      <p className="text-[11px] font-medium text-muted">QR included</p>
+                      <button
+                        type="button"
+                        onClick={downloadQRCode}
+                        className="mt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-brand-600 hover:text-brand-700"
+                      >
+                        <Download className="h-3 w-3" /> Download
+                      </button>
                     </div>
-                )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-                {/* QR Code Generation and Download */}
-                {shortenedURL && (
-                    <div className="mt-5 flex flex-col items-center">
-                        <p className="text-lg text-gray-900 dark:text-white">Your QR code:</p>
-                        <QRCodeCanvas
-                            id="qrcode"
-                            value={shortenedURL}
-                            size={128}
-                            bgColor={"#ffffff"}
-                            fgColor={"#000000"}
-                            level={"H"}
-                            className=''
-                            imageSettings={{
-                                src: "https://res.cloudinary.com/sggs/image/upload/v1731136210/user_profile_photos/logo_yqftnr.png",
-                                x: undefined,
-                                y: undefined,
-                                height: 24,
-                                width: 24,
-                                opacity: 1,
-                                excavate: true,
-                              }}
-                            includeMargin={false}
-                        />
-                        <button
-                            onClick={downloadQRCode}
-                            className="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-3 dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
-                        >
-                            Download QR Code
-                        </button>
-                    </div>
-
-                )}
-            </section>
-        </>
-    );
+        {!shortenedURL && (
+          <div className="mt-5 grid grid-cols-3 gap-2 border-t border-ink/10 pt-4">
+            {[
+              { icon: MousePointerClick, label: "Click tracking" },
+              { icon: QrCode, label: "QR included" },
+              { icon: Sparkles, label: "Custom alias" },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center gap-1.5 text-[11px] text-muted">
+                <item.icon className="h-3.5 w-3.5 text-brand-500" />
+                <span>{item.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default ShortenLink;

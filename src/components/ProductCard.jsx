@@ -1,32 +1,46 @@
-// ProductCard.jsx
-import React from 'react';
+import { Link } from "react-router-dom";
+import { ArrowUpRight } from "lucide-react";
+import { SpotlightCard } from "./ui/card";
+import { cn } from "../lib/utils";
 
-function ProductCard({ img, title, description }) {
+function ProductCard({
+  icon,
+  eyebrow,
+  title,
+  description,
+  to,
+  cta = "Explore",
+  accent = "brand",
+  children,
+  className,
+}) {
+  const accents = {
+    brand: "bg-brand-50 text-brand-600",
+    sky: "bg-sky-50 text-sky-600",
+    coral: "bg-coral-400/10 text-coral-600",
+  };
+
   return (
-    
-
-<div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <a href="#">
-        <img className="rounded-t-lg" src={img} alt="" />
-    </a>
-    <div className="p-5">
-        <a href="#">
-            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                {title}
-            </h5>
-        </a>
-        <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-            {description}
-        </p>
-        <a href="#" className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-            Read more
-             <svg className="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
-            </svg>
-        </a>
-    </div>
-</div>
-
+    <SpotlightCard
+      className={cn("flex h-full flex-col overflow-hidden", className)}
+      spotlightColor="rgba(109,94,246,0.12)"
+    >
+      <Link to={to} className="flex h-full flex-col p-5 sm:p-6">
+        <div className="flex items-start justify-between">
+          <div className={cn("flex h-11 w-11 items-center justify-center rounded-2xl", accents[accent] || accents.brand)}>
+            {icon}
+          </div>
+          <ArrowUpRight className="h-4 w-4 text-ink/25 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-600" />
+        </div>
+        {eyebrow && <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.17em] text-ink/35">{eyebrow}</p>}
+        <h3 className="mt-2 font-display text-xl font-semibold tracking-[-0.035em] text-ink">{title}</h3>
+        <p className="mt-2 text-[13px] leading-6 text-muted">{description}</p>
+        <div className="mt-5 flex-1">{children}</div>
+        <span className="mt-5 inline-flex items-center gap-1.5 text-[12px] font-semibold text-ink transition group-hover:text-brand-600">
+          {cta} <ArrowUpRight className="h-3.5 w-3.5" />
+        </span>
+      </Link>
+    </SpotlightCard>
   );
 }
 
