@@ -110,7 +110,7 @@ function Pricing() {
           </div>
         </Show>
 
-        <div className="overflow-hidden rounded-[2rem] border border-ink/10 bg-white p-2 shadow-card sm:p-4">
+        <div className="pricing-table-shell overflow-hidden rounded-[2rem] border border-ink/10 bg-white p-2 shadow-card sm:p-4">
           <BillingBoundary>
             <PricingTable
               for="user"
@@ -136,8 +136,9 @@ function Pricing() {
         </div>
 
         <p className="mt-3 text-center text-[11px] leading-5 text-muted">
-          Choose monthly or yearly billing above. The exact USD amount is shown
-          by Clerk before you confirm.
+          Use the <span className="font-semibold text-ink">Billed annually</span>{" "}
+          switch on any paid plan to compare monthly and yearly pricing. The
+          exact USD amount is shown by Clerk before you confirm.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 rounded-2xl border border-ink/10 bg-white px-5 py-4 shadow-card">

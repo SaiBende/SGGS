@@ -195,3 +195,17 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Clerk's PricingTable caps its grid at three columns, which leaves the fourth
+   plan stranded on its own row. Keep the four-plan catalog balanced. */
+@media (min-width: 1200px) {
+  .pricing-table-shell .cl-pricingTable {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .pricing-table-shell .cl-pricingTable {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
