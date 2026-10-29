@@ -47,7 +47,7 @@ import { BackgroundBeams } from "../components/ui/background-beams";
 const LOGO_URL =
   "https://res.cloudinary.com/sggs/image/upload/v1731136210/user_profile_photos/logo_yqftnr.png";
 
-const planLimits = { basic: 10, standard: 30, premium: Infinity };
+const planLimits = { basic: 20, standard: 30, premium: Infinity };
 const rowAccents = [
   "bg-brand-50 text-brand-600",
   "bg-sky-50 text-sky-600",

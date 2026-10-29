@@ -48,7 +48,7 @@ const faqs = [
   },
   {
     q: "Which plan has unlimited links?",
-    a: "Premium has unlimited active short links. Basic includes 10 and Standard includes 30.",
+    a: "Premium has unlimited active short links. Basic includes 20 and Standard includes 30.",
   },
   {
     q: "Does SGGS store my card details?",
