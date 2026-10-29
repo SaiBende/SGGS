@@ -114,11 +114,14 @@ The visual language lives in `src/index.css` and `tailwind.config.js`:
    - Optional: rename the Clerk application to **SGGS** for branded headings.
    - **Billing:** claim the application first (`npx clerk auth login`) if it
      was created as an accountless development instance; an unclaimed app cannot
-     enable Billing. Then enable Billing for users and create plans with the
-     slugs `free`, `basic`, `standard` and `premium`. Give each paid plan both a
-     **monthly** and a **yearly** price so the pricing table shows the period
-     toggle. The backend owns the slug → quota mapping; see the backend README.
-     Do not mention custom domains in the plan descriptions.
+     enable Billing. Then enable Billing for users. Clerk creates the default
+     Free plan with the slug `free_user`; keep it as the default and create the
+     paid plans with the slugs `basic`, `standard` and `premium`. The configured
+     ladder is Basic $2/month ($20.04/year), Standard $5/month ($50.04/year) and
+     Premium $15/month ($150/year). Give each paid plan both a **monthly** and a
+     **yearly** price so the pricing table shows the period toggle. The backend
+     owns the slug → quota mapping; see the backend README. Do not mention custom
+     domains in the plan descriptions.
 
 5. **Run the development server:**
    ```sh
