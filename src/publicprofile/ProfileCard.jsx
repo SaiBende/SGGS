@@ -18,15 +18,23 @@ import { Badge } from "../components/ui/badge";
 import { BrandMark } from "../components/ui/brand-mark";
 import { buttonVariants } from "../components/ui/button";
 
-function ProfileCard() {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+function ProfileCard({ username: usernameProp, initialProfile = null }) {
+  const [profile, setProfile] = useState(initialProfile);
+  const [loading, setLoading] = useState(!initialProfile);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const params = useParams();
-  const { username } = params;
+  const username = usernameProp || params.username;
 
   const loadProfile = useCallback(async () => {
+    // Tenant hosts already resolved the profile through /api/public/site.
+    if (initialProfile) {
+      setProfile(initialProfile);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
     setProfile(null);
     setError(null);
     setLoading(true);
@@ -45,7 +53,7 @@ function ProfileCard() {
     } finally {
       setLoading(false);
     }
-  }, [username]);
+  }, [username, initialProfile]);
 
   useEffect(() => {
     loadProfile();

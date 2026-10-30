@@ -19,6 +19,7 @@ Aceternity-style motion and layout primitives — no component-library dependenc
 - **URL shortener:** Shorten any URL with an optional custom back-half. Every link gets a copy button, QR code and click history.
 - **QR studio:** Design a QR code with colour presets, foreground/background colours, dot styles, error correction, size and an optional logo, then download a print-ready PNG.
 - **Link-in-bio page:** Add a photo, bio and social links, preview the page live, and publish at `/u/<username>`.
+- **Platform subdomains:** Public profiles are also served from DNS-safe handles at `<handle>.sggs.saibende.in`, with short links at `<handle>.sggs.saibende.in/<shortId>`.
 - **Dashboard:** Search, sort, copy, rename and delete links; open per-link analytics or a downloadable QR code; track plan usage from one workspace.
 - **Analytics:** Per-link visit history rendered as a daily trend chart.
 - **Authentication:** Clerk’s prebuilt sign-in/sign-up UI, email verification, MFA and password reset, themed to match the app.
@@ -89,6 +90,12 @@ The visual language lives in `src/index.css` and `tailwind.config.js`:
    VITE_API_URL=http://localhost:8000/api
    VITE_FRONTEND_URL=http://localhost:5173
    VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
+   # Optional: base domain for public profile subdomains.
+   # Defaults to sggs.saibende.in.
+   # VITE_PLATFORM_DOMAIN=sggs.saibende.in
+   # Optional: comma-separated hosts that always render the full app.
+   # Defaults to sggs.saibende.in,www.sggs.saibende.in,sggs-kappa.vercel.app.
+   # VITE_MAIN_HOSTS=sggs.saibende.in,www.sggs.saibende.in,sggs-kappa.vercel.app
    ```
 
    `VITE_CLERK_PUBLISHABLE_KEY` must belong to the same Clerk application as
@@ -130,6 +137,44 @@ The visual language lives in `src/index.css` and `tailwind.config.js`:
 
    The app will be available at [http://localhost:5173](http://localhost:5173).
 
+### Platform subdomains
+
+Profile pages are hosted on platform subdomains in addition to `/u/<username>`.
+The tenant app is selected from `window.location.hostname` in
+`src/lib/platform.js`:
+
+- `https://<handle>.sggs.saibende.in/` renders the public profile.
+- `https://<handle>.sggs.saibende.in/<shortId>` resolves the short link.
+- App paths such as `/login`, `/dashboard` and `/pricing` redirect to the main
+  origin. Clerk is never mounted on a tenant host.
+
+`*.localhost` resolves to `127.0.0.1` on most systems, so local testing needs no
+hosts-file entry. With the API on port `8000` and Vite on `5173`:
+
+```
+http://sai-bende.localhost:5173/        # public profile
+http://sai-bende.localhost:5173/<id>    # short-link redirect
+http://localhost:5173/                  # full app with Clerk
+```
+
+If the profile shows a 404, make sure the backend has a matching handle
+(`npm run backfill:handles` in the backend repository).
+
+#### DNS
+
+The Vercel project owns the wildcard certificate:
+
+| Type | Name | Value |
+| --- | --- | --- |
+| CNAME | `*` (under `sggs`) | `e1082a6bd772692c.vercel-dns-017.com` |
+| NS | `_acme-challenge.sggs` | `ns1.vercel-dns.com` |
+| NS | `_acme-challenge.sggs` | `ns2.vercel-dns.com` |
+
+Add `*.sggs.saibende.in` to the Vercel project before creating these records.
+Vercel issues wildcard certificates with DNS-01, so the `_acme-challenge.sggs`
+delegation is required. If the DNS provider rejects NS records, move the zone to
+Cloudflare or another provider that supports NS delegation.
+
 ---
 
 ## Project Structure
@@ -141,11 +186,12 @@ The visual language lives in `src/index.css` and `tailwind.config.js`:
 │   ├── assets/
 │   ├── components/
 │   │   └── ui/            # buttons, cards, modals, beams, brand mark, etc.
-│   ├── lib/               # brand helpers, class merging, formatting
+│   ├── lib/               # brand/platform helpers, class merging, formatting
 │   ├── legacy/
 │   │   └── stripe/        # inactive Stripe pricing and return pages
 │   ├── pages/             # Home, Dashboard, Pricing, LinkTree, About, ...
 │   ├── publicprofile/     # public /u/:username profile
+│   ├── tenant/            # subdomain profile, redirects and 404
 │   ├── utils/             # Clerk auth, appearance, redirect helpers
 │   ├── App.jsx
 │   ├── Layout.jsx
@@ -183,7 +229,8 @@ chunks are the next performance step when it becomes important.
 
 > **New accounts:** sign-up uses Clerk’s prebuilt form and does not ask for a
 > username. Your public profile username is generated automatically from your
-> email and can be used at `/u/<username>`.
+> email and can be used at `/u/<username>`; a DNS-safe handle and subdomain are
+> generated at the same time.
 
 - **Shorten a URL:** Sign in, open **Create link** (`/shortenlink`), enter the
   destination and an optional custom back-half. Copy or share the short link
@@ -193,9 +240,11 @@ chunks are the next performance step when it becomes important.
   is rendered in the browser; no destination data is stored.
 - **Build your link-in-bio page:** At `/linktree`, add a photo, bio and social
   links. The preview updates as you type and the public page is live at
-  `/u/<username>`.
+  `/u/<username>` and at your platform subdomain,
+  `<handle>.sggs.saibende.in`.
 - **Manage from the dashboard:** At `/dashboard`, search, sort, rename, delete
-  and analyse your links, check plan usage, and copy your public page URL.
+  and analyse your links, check plan usage, and copy your public page URL or
+  platform subdomain.
 
 Protected routes redirect signed-out visitors to `/login` and return them to
 the requested page after authentication.

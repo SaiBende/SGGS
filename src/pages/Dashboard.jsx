@@ -32,6 +32,7 @@ import { apiFetch } from "../utils/auth";
 import { clerkBillingAppearance } from "../utils/clerkAppearance";
 import { cn } from "../lib/utils";
 import { shortDomain, shortUrl } from "../lib/brand";
+import { platformUrl } from "../lib/platform";
 import VisitTrends from "../components/VisitTrends";
 import Loading from "../components/Loading";
 import ErrorState from "../components/ErrorState";
@@ -299,8 +300,8 @@ function PlanCard({ user, linkCount, className }) {
   );
 }
 
-function ProfileRailCard({ user, onCopy, copied }) {
-  const profileUrl = `${import.meta.env.VITE_FRONTEND_URL}/u/${user.username}`;
+function ProfileRailCard({ user, profileUrl, onCopy, copied }) {
+  const profileHost = String(profileUrl || "").replace(/^https?:\/\//, "");
 
   return (
     <div className="rounded-2xl border border-ink/10 bg-white p-5 shadow-card">
@@ -318,13 +319,15 @@ function ProfileRailCard({ user, onCopy, copied }) {
         </span>
         <div className="min-w-0">
           <p className="truncate text-[13px] font-semibold text-ink">@{user.username}</p>
-          <p className="text-[11px] text-muted">Your public page</p>
+          <p className="text-[11px] text-muted">
+            {user.handle ? "Your SGGS address" : "Your public page"}
+          </p>
         </div>
         <span className="ml-auto h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.12)]" />
       </div>
 
       <div className="mt-4 flex items-center gap-1.5 rounded-lg border border-ink/10 bg-canvas px-2.5 py-2">
-        <span className="min-w-0 flex-1 truncate text-[10px] text-muted">{profileUrl}</span>
+        <span className="min-w-0 flex-1 truncate text-[10px] text-muted">{profileHost}</span>
         <button
           type="button"
           onClick={onCopy}
@@ -503,6 +506,11 @@ function Dashboard() {
 
   const urls = useMemo(() => userData?.urls || [], [userData]);
   const user = userData?.user;
+  const profileUrl = user?.handle
+    ? platformUrl(user.handle)
+    : user
+      ? `${window.location.origin}/u/${user.username}`
+      : "";
 
   const filteredUrls = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -567,10 +575,10 @@ function Dashboard() {
   };
 
   const copyProfile = () => {
-    if (!user) return;
-    copyText(`${import.meta.env.VITE_FRONTEND_URL}/u/${user.username}`, () => {
+    if (!user || !profileUrl) return;
+    copyText(profileUrl, () => {
       setProfileCopied(true);
-      toast.success("Profile URL copied");
+      toast.success(user.handle ? "Subdomain copied" : "Profile URL copied");
       window.setTimeout(() => setProfileCopied(false), 1800);
     });
   };
@@ -866,7 +874,12 @@ function Dashboard() {
               </section>
 
               <div className="space-y-4">
-                <ProfileRailCard user={user} onCopy={copyProfile} copied={profileCopied} />
+                <ProfileRailCard
+                  user={user}
+                  profileUrl={profileUrl}
+                  onCopy={copyProfile}
+                  copied={profileCopied}
+                />
                 <QuickActions />
               </div>
             </div>
