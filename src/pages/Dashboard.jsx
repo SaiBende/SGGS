@@ -511,6 +511,7 @@ function Dashboard() {
     : user
       ? `${window.location.origin}/u/${user.username}`
       : "";
+  const profileHost = profileUrl.replace(/^https?:\/\//, "");
 
   const filteredUrls = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -760,6 +761,42 @@ function Dashboard() {
             </Link>
           </div>
         </div>
+
+        <section className="mt-6 flex flex-col gap-3 rounded-2xl border border-brand-200 bg-brand-50/70 p-4 shadow-card sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="flex min-w-0 items-start gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-brand-600 shadow-sm">
+              <Sparkles className="h-4 w-4" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold text-ink">Your public page is live</p>
+              <a
+                href={profileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-0.5 block truncate text-[12px] font-medium text-brand-700 hover:text-brand-800"
+              >
+                {profileHost}
+              </a>
+              <p className="mt-1 text-[10px] leading-5 text-muted">
+                Share this address. Visitors see your photo, bio and links.
+              </p>
+            </div>
+          </div>
+          <div className="grid shrink-0 grid-cols-2 gap-2 sm:flex">
+            <Button variant="secondary" size="sm" onClick={copyProfile}>
+              {profileCopied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+              {profileCopied ? "Copied" : "Copy address"}
+            </Button>
+            <a
+              href={profileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({ variant: "primary", size: "sm" })}
+            >
+              Open page <ArrowUpRight className="h-3.5 w-3.5" />
+            </a>
+          </div>
+        </section>
 
         <div className="mt-7 grid grid-cols-1 gap-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
           <aside className="hidden space-y-4 lg:sticky lg:top-24 lg:block">
