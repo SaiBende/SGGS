@@ -4,6 +4,7 @@ import { useAuth, useUser } from "@clerk/react";
 import { toast } from "react-toastify";
 import {
   ChevronDown,
+  ExternalLink,
   LayoutDashboard,
   Link2,
   LogOut,
@@ -13,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { apiFetch } from "../utils/auth";
+import { platformUrl } from "../lib/platform";
 import { cn } from "../lib/utils";
 import { Button, buttonVariants } from "./ui/button";
 import { BrandMark } from "./ui/brand-mark";
@@ -107,6 +109,11 @@ function Navigationbar() {
     .map((part) => part[0])
     .join("")
     .toUpperCase();
+  const publicUrl = profile?.handle
+    ? platformUrl(profile.handle)
+    : profile?.username
+      ? `/u/${profile.username}`
+      : null;
 
   return (
     <header
@@ -188,6 +195,18 @@ function Navigationbar() {
                     <Link to="/linktree" role="menuitem" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-ink/65 transition hover:bg-ink/[0.04] hover:text-ink">
                       <Link2 className="h-4 w-4 text-ink/40" /> Link in bio
                     </Link>
+                    {publicUrl && (
+                      <a
+                        href={publicUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        role="menuitem"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-ink/65 transition hover:bg-ink/[0.04] hover:text-ink"
+                      >
+                        <ExternalLink className="h-4 w-4 text-ink/40" /> Your public page
+                      </a>
+                    )}
                   </div>
                   <div className="border-t border-ink/10 pt-1.5">
                     <button

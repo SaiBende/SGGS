@@ -29,7 +29,8 @@ function Register() {
                 </h1>
                 <p className="mt-2 text-[13px] leading-6 text-muted">
                     One account for your short links, QR codes and public page.
-                    No credit card needed.
+                    Your page gets its own SGGS address automatically. No credit
+                    card needed.
                 </p>
             </div>
 
@@ -45,11 +46,11 @@ function Register() {
 
             <div className="mt-5 rounded-xl border border-ink/10 bg-canvas p-3">
                 <p className="flex items-center gap-1.5 text-[11px] font-semibold text-ink/70">
-                    <UserRound className="h-3.5 w-3.5 text-brand-500" /> Your public username is generated automatically.
+                    <UserRound className="h-3.5 w-3.5 text-brand-500" /> Your public page is created automatically.
                 </p>
                 <p className="mt-1 pl-5 text-[10px] leading-5 text-muted">
-                    We use the first part of your verified email. You can edit your
-                    page details later.
+                    Your username and SGGS address are generated from your verified
+                    email. You can edit the page details later.
                 </p>
             </div>
 
