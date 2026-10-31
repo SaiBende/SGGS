@@ -6,6 +6,7 @@ import {
   BadgeCheck,
   CheckCircle2,
   CreditCard,
+  Globe2,
   Settings2,
   ShieldCheck,
   Sparkles,
@@ -15,9 +16,11 @@ import { PageHero } from "../components/ui/section-heading";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import BillingBoundary from "../components/BillingBoundary";
+import { BRAND } from "../lib/brand";
 import { clerkBillingAppearance as clerkAppearance } from "../utils/clerkAppearance";
 
 const included = [
+  "Your own SGGS subdomain",
   "Custom back-halves",
   "QR downloads",
   "Visit trends",
@@ -51,6 +54,10 @@ const faqs = [
     a: "Premium has unlimited active short links. Basic includes 20 and Standard includes 30.",
   },
   {
+    q: "Do I get my own subdomain?",
+    a: `Yes. Every account, including Free, gets a personal link-in-bio page at your-handle.${BRAND.domain}. Paid plans add more link capacity and premium tools; the address is included in every plan.`,
+  },
+  {
     q: "Does SGGS store my card details?",
     a: "No. Payment details are handled by Clerk Billing. SGGS only stores your plan and subscription status so quotas can be enforced.",
   },
@@ -67,7 +74,7 @@ function Pricing() {
             <span className="text-gradient">that matter.</span>
           </>
         }
-        description="Monthly or yearly plans, billed securely through Clerk. Upgrade, switch periods, or cancel whenever your link library changes."
+        description={`Monthly or yearly plans, billed securely through Clerk. Every account includes a personal page at your-handle.${BRAND.domain}. Upgrade, switch periods, or cancel whenever your link library changes.`}
         actions={
           <div className="flex flex-wrap items-center justify-center gap-2">
             <Badge variant="outline" className="gap-1.5 px-3 py-2 text-[11px]">
@@ -76,6 +83,10 @@ function Pricing() {
             </Badge>
             <Badge variant="outline" className="gap-1.5 px-3 py-2 text-[11px]">
               <Zap className="h-3.5 w-3.5 text-amber-500" /> Activate instantly
+            </Badge>
+            <Badge variant="outline" className="gap-1.5 px-3 py-2 text-[11px]">
+              <Globe2 className="h-3.5 w-3.5 text-brand-500" /> Personal page
+              included
             </Badge>
           </div>
         }

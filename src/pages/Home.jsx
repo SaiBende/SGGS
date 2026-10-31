@@ -33,7 +33,7 @@ const faqs = [
   {
     question: "Do I need a paid plan to start?",
     answer:
-      "No. You can start with a free account, create links, and explore the QR and profile tools. Paid plans raise your link limit and extend access to the premium tools.",
+      "No. You can start with a free account, create links, and explore the QR and profile tools. Free includes your own SGGS subdomain and link-in-bio page. Paid plans raise your link limit and extend access to the premium tools.",
   },
   {
     question: "Can I use my own custom back-half?",
@@ -47,8 +47,11 @@ const faqs = [
   },
   {
     question: "What is the link-in-bio page?",
-    answer:
-      "It is a shareable profile at /u/your-username with your photo, bio, and social links. You can update it whenever you like, then share one URL everywhere.",
+    answer: `It is your own public page at your-handle.${BRAND.domain} with your photo, bio, and social links. Every account gets one automatically, and the old /u/your-username address also keeps working.`,
+  },
+  {
+    question: "Do I get my own subdomain?",
+    answer: `Yes. Every account, including Free, gets a personal page at your-handle.${BRAND.domain}. Paid plans add more link capacity and premium tools; the address is included in every plan.`,
   },
 ];
 
@@ -97,6 +100,7 @@ function BioVisual() {
           SB
         </span>
         <span className="mt-2 text-[10px] font-semibold text-white">Your name</span>
+        <span className="mt-0.5 text-[8px] text-brand-200/60">yourname.{BRAND.domain}</span>
         <div className="mt-3 w-full space-y-1.5">
           <div className="rounded-md bg-white/[0.08] py-1.5 text-center text-[8px] text-white/60">Portfolio</div>
           <div className="rounded-md bg-white/[0.08] py-1.5 text-center text-[8px] text-white/60">Latest work</div>
@@ -208,7 +212,7 @@ function Home() {
               icon={<UserRound className="h-5 w-5" />}
               eyebrow="Link in bio"
               title="One page. Every link."
-              description="A public profile with your photo, bio, and the places people should go next."
+              description={`A public profile at yourname.${BRAND.domain} with your photo, bio, and the places people should go next.`}
               cta="Build your page"
               accent="coral"
             >

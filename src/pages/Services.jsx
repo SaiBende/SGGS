@@ -15,7 +15,7 @@ import { Badge } from "../components/ui/badge";
 import { buttonVariants } from "../components/ui/button";
 import { SpotlightCard } from "../components/ui/card";
 import { SocialIcon } from "../components/ui/social-icon";
-import { brandShortLink } from "../lib/brand";
+import { BRAND, brandShortLink } from "../lib/brand";
 
 const tools = [
   {
@@ -63,7 +63,7 @@ const tools = [
   {
     icon: UserRound,
     title: "Link in bio",
-    description: "One public page for your photo, bio and every link worth sharing.",
+    description: `One public page at yourname.${BRAND.domain} for your photo, bio and every link worth sharing.`,
     to: "/linktree",
     cta: "Open profile builder",
     accent: "bg-coral-400/10 text-coral-600",
@@ -72,6 +72,7 @@ const tools = [
         <div className="flex flex-col items-center rounded-xl bg-white/[0.04] px-3 py-4">
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-sky-400 text-[9px] font-bold text-white">SB</span>
           <span className="mt-2 text-[10px] font-semibold text-white">@yourname</span>
+          <span className="mt-0.5 text-[7px] text-brand-200/60">{`yourname.${BRAND.domain}`}</span>
           <div className="mt-2 grid w-full gap-1.5">
             {["Portfolio", "Say hello"].map((label) => (
               <span key={label} className="rounded-md border border-white/10 bg-white/[0.06] py-1 text-center text-[8px] text-white/55">{label}</span>

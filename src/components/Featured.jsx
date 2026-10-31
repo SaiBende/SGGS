@@ -109,6 +109,7 @@ function ProfileVisual() {
           SB
         </div>
         <p className="mt-2 text-[11px] font-semibold text-white">Sai Bende</p>
+        <p className="mt-0.5 text-[8px] text-brand-200/60">sai-bende.{BRAND.domain}</p>
         <p className="mt-1 text-center text-[9px] leading-4 text-white/40">Designer, builder, link collector.</p>
         <div className="mt-3 grid w-full gap-1.5">
           {["Portfolio", "Latest work", "Say hello"].map((label) => (
@@ -169,7 +170,7 @@ function Featured() {
             className="md:col-span-2"
             icon={<UserRound className="h-5 w-5" />}
             title="A link-in-bio worth visiting"
-            description="One profile page for every place you exist. Add your photo, a short bio, and your best links."
+            description={`One profile page at yourname.${BRAND.domain} for every place you exist. Add your photo, a short bio, and your best links.`}
             header={<ProfileVisual />}
           />
           <BentoGridItem
