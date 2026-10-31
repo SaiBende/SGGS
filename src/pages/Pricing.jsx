@@ -55,7 +55,7 @@ const faqs = [
   },
   {
     q: "Do I get my own subdomain?",
-    a: `Yes. Every account, including Free, gets a personal link-in-bio page at your-handle.${BRAND.domain}. Paid plans add more link capacity and premium tools; the address is included in every plan.`,
+    a: `Yes. Every account, including Free, gets a personal link-in-bio page at yourname.${BRAND.domain}. Paid plans add more link capacity and premium tools; the address is included in every plan.`,
   },
   {
     q: "Does SGGS store my card details?",
@@ -74,7 +74,7 @@ function Pricing() {
             <span className="text-gradient">that matter.</span>
           </>
         }
-        description={`Monthly or yearly plans, billed securely through Clerk. Every account includes a personal page at your-handle.${BRAND.domain}. Upgrade, switch periods, or cancel whenever your link library changes.`}
+        description={`Monthly or yearly plans, billed securely through Clerk. Every account includes a personal page at yourname.${BRAND.domain}. Upgrade, switch periods, or cancel whenever your link library changes.`}
         actions={
           <div className="flex flex-wrap items-center justify-center gap-2">
             <Badge variant="outline" className="gap-1.5 px-3 py-2 text-[11px]">

@@ -47,11 +47,11 @@ const faqs = [
   },
   {
     question: "What is the link-in-bio page?",
-    answer: `It is your own public page at your-handle.${BRAND.domain} with your photo, bio, and social links. Every account gets one automatically, and the old /u/your-username address also keeps working.`,
+    answer: `It is your own public page at yourname.${BRAND.domain} with your photo, bio, and social links. Every account gets one automatically, and the old /u/your-username address also keeps working.`,
   },
   {
     question: "Do I get my own subdomain?",
-    answer: `Yes. Every account, including Free, gets a personal page at your-handle.${BRAND.domain}. Paid plans add more link capacity and premium tools; the address is included in every plan.`,
+    answer: `Yes. Every account, including Free, gets a personal page at yourname.${BRAND.domain}. Paid plans add more link capacity and premium tools; the address is included in every plan.`,
   },
 ];
 
