@@ -482,6 +482,8 @@ function LinkTree() {
     } catch (saveError) {
       console.error("Error updating page address:", saveError);
       setConfirmAddressOpen(false);
+      setIdentityCheck(null);
+      setIdentityCheckVersion((value) => value + 1);
       setError(saveError.message || "Could not update your page address.");
     } finally {
       setSavingIdentity(false);
