@@ -40,7 +40,9 @@ function ProfileCard({ username: usernameProp, initialProfile = null }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/u/${username}`);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/u/${encodeURIComponent(username)}`
+      );
       const data = await response.json();
       if (!response.ok || data.error) {
         setError(data.error || "Profile not found");

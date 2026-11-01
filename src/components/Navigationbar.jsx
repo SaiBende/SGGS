@@ -32,6 +32,7 @@ function Navigationbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [profileRefreshKey, setProfileRefreshKey] = useState(0);
   const { isLoaded, isSignedIn, signOut } = useAuth();
   const { user: clerkUser } = useUser();
   const location = useLocation();
@@ -57,6 +58,13 @@ function Navigationbar() {
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, []);
+
+  useEffect(() => {
+    const onProfileUpdated = () => setProfileRefreshKey((value) => value + 1);
+    window.addEventListener("sggs:profile-updated", onProfileUpdated);
+    return () =>
+      window.removeEventListener("sggs:profile-updated", onProfileUpdated);
   }, []);
 
   useEffect(() => {
@@ -87,7 +95,7 @@ function Navigationbar() {
     return () => {
       cancelled = true;
     };
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, profileRefreshKey]);
 
   const handleLogout = async () => {
     try {

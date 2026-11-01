@@ -20,6 +20,7 @@ Aceternity-style motion and layout primitives — no component-library dependenc
 - **QR studio:** Design a QR code with colour presets, foreground/background colours, dot styles, error correction, size and an optional logo, then download a print-ready PNG.
 - **Link-in-bio page:** Add a photo, bio and social links, preview the page live, and publish at `/u/<username>`.
 - **Platform subdomains:** Public profiles are also served from DNS-safe handles at `<handle>.sggs.saibende.in`, with short links at `<handle>.sggs.saibende.in/<shortId>`.
+- **Editable page address:** Change the username and subdomain from the page editor, with live availability checks, a shared name pool and a clear warning that old links stop working.
 - **Dashboard:** Search, sort, copy, rename and delete links; open per-link analytics or a downloadable QR code; track plan usage from one workspace.
 - **Analytics:** Per-link visit history rendered as a daily trend chart.
 - **Authentication:** Clerk’s prebuilt sign-in/sign-up UI, email verification, MFA and password reset, themed to match the app.
@@ -147,6 +148,11 @@ The tenant app is selected from `window.location.hostname` in
 - `https://<handle>.sggs.saibende.in/<shortId>` resolves the short link.
 - App paths such as `/login`, `/dashboard` and `/pricing` redirect to the main
   origin. Clerk is never mounted on a tenant host.
+
+Users can change their username and subdomain from **Link in bio → Page
+address**. The subdomain follows the username until the user edits it as an
+advanced override. Both values share one reservation pool, and changing either
+one makes the old address stop working immediately; no redirect is kept.
 
 `*.localhost` resolves to `127.0.0.1` on most systems, so local testing needs no
 hosts-file entry. With the API on port `8000` and Vite on `5173`:

@@ -351,6 +351,12 @@ function ProfileRailCard({ user, profileUrl, onCopy, copied }) {
           Open <ArrowUpRight className="h-3 w-3" />
         </a>
       </div>
+      <Link
+        to="/linktree?section=address"
+        className="mt-2 flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] font-semibold text-ink/45 transition hover:bg-ink/[0.035] hover:text-ink"
+      >
+        <Settings2 className="h-3 w-3" /> Change address
+      </Link>
     </div>
   );
 }
@@ -509,7 +515,7 @@ function Dashboard() {
   const profileUrl = user?.handle
     ? platformUrl(user.handle)
     : user
-      ? `${window.location.origin}/u/${user.username}`
+      ? `${window.location.origin}/u/${encodeURIComponent(user.username)}`
       : "";
   const profileHost = profileUrl.replace(/^https?:\/\//, "");
 
