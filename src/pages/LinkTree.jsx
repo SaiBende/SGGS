@@ -385,7 +385,7 @@ function LinkTree() {
       : "";
   const draftProfileUrl = draftHandle ? platformUrl(draftHandle) : "";
   const addressChanged =
-    normalizedDraftUsername !== username ||
+    normalizedDraftUsername !== normalizeUsername(username) ||
     normalizedDraftHandle !== (user?.handle || "");
   const usernameUnchanged =
     Boolean(user) &&
