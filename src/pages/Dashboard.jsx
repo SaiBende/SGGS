@@ -69,6 +69,13 @@ function prettyUrl(url) {
   return String(url || "").replace(/^https?:\/\//, "");
 }
 
+// The API returns `clicks` (Visit counter + legacy visitHistory length). The
+// fallback keeps the dashboard working during a rolling deploy.
+function clickCount(url) {
+  if (Number.isFinite(url?.clicks)) return url.clicks;
+  return (url?.visitCount || 0) + (url?.visitHistory?.length || 0);
+}
+
 function LinkRow({
   url,
   index,
@@ -81,7 +88,7 @@ function LinkRow({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
-  const clicks = url.visitHistory?.length || 0;
+  const clicks = clickCount(url);
 
   useEffect(() => {
     if (!menuOpen) return undefined;
@@ -531,14 +538,14 @@ function Dashboard() {
 
     return [...list].sort((a, b) => {
       if (sortBy === "clicks") {
-        return (b.visitHistory?.length || 0) - (a.visitHistory?.length || 0);
+        return clickCount(b) - clickCount(a);
       }
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }, [urls, search, sortBy]);
 
   const totalClicks = useMemo(
-    () => urls.reduce((sum, url) => sum + (url.visitHistory?.length || 0), 0),
+    () => urls.reduce((sum, url) => sum + clickCount(url), 0),
     [urls]
   );
   const limit = user?.plan?.unlimited
