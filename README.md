@@ -284,6 +284,47 @@ Pricing and checkout are rendered by Clerk Billing:
 
 The old Stripe pages are preserved in `src/legacy/stripe/` and are not routed.
 
+## Capacity & load report
+
+This frontend is a static Vite build served from Vercel's CDN, so it stores no
+per-user data and is not the capacity bottleneck. The real limits sit in the
+backend's MongoDB Atlas Free cluster: **0.5 GB including indexes**, 100 ops/sec
+and 500 connections.
+
+A probe against Atlas Free with 1,000 users, 10,000 links and 5,000 visits
+(method and full output in the backend README) measured **1,011 B per
+user/handle**, **340 B per link** and **1,249 B per visit**, including indexes.
+That gives:
+
+| Scenario | Users / handles | Links |
+| --- | ---: | ---: |
+| Best: metadata only, 10 links/user | 113,378 | 1,133,780 |
+| Optimal: 30% metadata / 70% visits, 10 links/user | 34,013 | 340,130 |
+| Best: metadata only, 20 links/user | 64,026 | 1,280,520 |
+| Optimal: 30% metadata / 70% visits, 20 links/user | 19,207 | 384,140 |
+| Best: metadata only, 30 links/user | 44,608 | 1,338,240 |
+| Optimal: 30% metadata / 70% visits, 30 links/user | 13,382 | 401,460 |
+| Worst: 30 links/user + 1 visit/link | 10,274 | 308,220 |
+| Worst: 30 links/user + 10 visits/link | 1,296 | 38,880 |
+| Visits only (no users/links) | — | 400,449 visits |
+
+- **Best** assumes no analytics stored; **optimal** reserves 70% of storage for
+  visits; **worst** assumes every account is on Standard (30 links) and every
+  link has 10 stored visits.
+- Visits dominate storage. At 10k clicks/day the free cluster fills in about
+  **40 days** (~28 days inside the optimal budget); at 50k/day, about **8 days**
+  (~5 days). There is no TTL or rollup yet.
+- Redirects measured **30.6 req/s** at 10 connections with zero errors. Each
+  redirect uses 3 Atlas ops, so the theoretical Free-tier ceiling is ~33 req/s.
+- The dashboard, QR studio, LinkTree pages and `/u/:username` profiles work
+  within these limits; QR generation is entirely client-side.
+
+Reproduce the measurement from the backend repository:
+
+```sh
+npm run capacity -- --users 1000 --links-per-user 10 --visits 5000
+```
+
 ## Backend URL
 
 The backend for this project is available here:  
